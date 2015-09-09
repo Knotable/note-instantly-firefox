@@ -1,0 +1,45 @@
+{
+  "title": "Note Instantly",
+  "name": "note-instantly",
+  "version": "3.1.2",
+  "description": "Super fast notes from your New Tab window",
+  "main": "main.js",
+  "author": "Knotable",
+  "icon": "./images/Knotable-logo.png",
+  "key":  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2c12b6MZa9gtKtqc6mxs7wOy6PMSAhmmaXTk+c24023dDana7lsFBzxzMYTKPJYHDTFVW/WbhNWMhKkq20zDQDcalocLMl31uoLRkNZfwzG9ZGUl4/U7lDsfrysmZiBGBG3KIswi2Kr92R4EWr88sr5iqAzUjMDyqtrBidlRsplnllExAfTNG//CcTOeR1BTWktg/TkN55iaK4cc12o9LVJY4mcnpE8QNsMf2awzrJKcGJI5m0R1KgQuowPRWi4yozHsdzGmRXJKS3kYMJHMMvbpWtKKaaXVDIkp3deGyqPaRXG7fhXikLI3BXcKVoIdsg37Z9f/oSCinMGg+PDVKQIDAQAB",
+  "engines": {
+    "firefox": ">=38.0a1"
+  },
+  "background": {
+    "persistent": true,
+    "scripts": [
+      "js/vendor/jquery.2.1.0.js",
+      "js/vendor/underscore-min.js",
+      "js/vendor/moment.min.js",
+      "js/vendor/ddp.js",
+      "js/vendor/q.js",
+      "js/chrome-adapter/attach-chrome.js",
+      "js/vendor/asteroid.cordova.js",
+
+      "js/background/ddp-log.js",
+      "js/background/asteroid.js",
+
+      "js/background/logger.js",
+      "js/background/config.js",
+      "js/background/account-helper.js",
+      "js/background/meteorDDP.js",
+      "js/background/background.js",
+      "js/background/subscriptions.js",
+      "js/background/messageManager.js"
+    ]
+  },
+  "content_scripts": {
+    "matches": [
+      "*://beta.knotable.com/*",
+      "*://staging.knotable.com/*",
+      "*://dev.knotable.com/*",
+      "http://localhost:3000/*",
+      "http://localhost:7000/*"
+    ]
+  }
+}

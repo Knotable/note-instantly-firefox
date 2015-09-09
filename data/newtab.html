@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>New Tab</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+
+
+        <link type="text/css" rel="stylesheet" href="css/knotableTopic.css">
+        <link type="text/css" rel="stylesheet" href="css/style.css">
+        <link type="text/css" rel="stylesheet" href="css/blank-tab.css">
+
+        <link type="text/css" rel="stylesheet" href="css/jquery-ui.min.css">
+        <link type="text/css" rel="stylesheet" href="css/jquery-ui.theme.css">
+
+    </head>
+    <body id="background-grad">
+        <img class="background-img"></img>
+        <div class="page-container">
+        <a href="#" id="pad-link" target="_blank"></a>
+
+        <div class="knotable-wrapper">
+            <div class="">
+                <nav class="" id="newtab-header">
+                    <div class="pull-left">
+                        <span><a id="newtab-topic-id" target="_blank"><img src="images/icon-48-new.png"></a></span>
+                        <span><a id="google-apps"><i class="glyphicon glyphicon-th"></i></a></span>
+                    </div>
+                    <ul class="pull-right col-lg-10 col-md-10 col-sm-10 visible-lg-block visible-md-block visible-sm-block">
+                        <li class="user-avatar-container knotable-hide">
+                            <a>
+                                <div class="col-sm-11">
+                                    <a><strong id="user-avatar-username"></strong></a>
+                                    <div><a id="user-avatar-displayname"></a></div>
+                                    <div>
+                                      <span id="btn-sync-knotes" style="cursor: pointer;">
+                                        <i  class="glyphicon glyphicon-cog"></i>
+                                        Settings
+                                      </span>
+                                      <a id="user-logout"><i class="glyphicon glyphicon-lock"></i> Logout</a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-1">
+                                    <div style="text-align: center;" id="userAvatar"><img /></div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- </ul> -->
+                </nav>
+                <div class="container-fluid">
+                    <div class="row" style="margin-top: 7%;">
+                        <div class="col-lg-6 col-sm-12 col-md-12" style="">
+                            <div class="clock visible-lg-block">
+                                <div class="clock-hour"></div>
+                                <div class="clock-date"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12 col-md-12" style="">
+                                <i class="" id="knote-sync-message" style="cursor: pointer; float: right; top: -18px;   margin-right: 15px; color: white;" >Syncing...</i>
+                            <div class="" id="knotes-container">
+
+<!--                             <span style="cursor: pointer; float: right; top: -18px;   margin-right: 3px; color: white;" >Syncing...</span> -->
+
+                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 knote-editor">
+
+                                    <div class="panel">
+                                        <div class="panel-body">
+                                            <textarea id="knote-edit-area" placeholder="Enter a note"></textarea>
+                                        </div>
+                                        <div class="">
+                                            <div class="pull-left">
+                                                <button class="btn btn-clear" id="btn-add-knote">
+                                                    <i class="glyphicon glyphicon-floppy-disk"></i>
+                                                </button>
+
+                                                <button class="btn btn-clear" id="btn-add-knote-plus">
+                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                </button>
+                                            </div>
+
+                                            <div class="pull-right">
+                                                <button disabled="disabled" class="btn btn-clear" title="Email knote" id="btn-email-knote">
+                                                    <i class="glyphicon glyphicon-envelope"></i>
+                                                </button>
+                                                <button disabled="disabled" class="btn btn-clear" id="btn-delete-knote">
+                                                    <i class="glyphicon glyphicon-trash"></i>
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 knote-list-container">
+                                    <div class="searchbox knotable-hide">
+                                        <i class="glyphicon glyphicon-search"></i>
+                                        <input type="text" placeholder="Search" id="searchbox">
+                                        <i class="glyphicon glyphicon-remove-sign"></i>
+                                    </div>
+
+                                    <ul class=" list-group" id="knotes-list">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="knotable-lightbox hidden" style="visibility: visible;" id="email-knote-container">
+                <div class="knotable-lightbox-inner">
+                </div>
+                <div class="knotable-box knotable-box-large" style="padding:0px;border-radius:5px;overflow:hidden">
+                    <div class="title-bar">
+                        <div class="email-close">X</div>
+                    </div>
+                    <div class="gmail-box-wrapper">
+
+                    <form id="email-knote-form" action="">
+                        <fieldset disabled="disabled">
+                        <p>
+                        <div class="input-group input-group-lg inner-div">
+                            <input name="email" id="email-knote-to" class="" placeholder="To" autofocus required title="Enter a valid email address" spellcheck="false" autocomplete="true">
+                        </div>
+                        <div class="input-group input-group-lg inner-div">
+                            <input type="text" name="subject" id="email-knote-subject" class="" placeholder="Subject" required>
+                        </div>
+                        </p>
+                        <div class="mail-content" style="height: 300px; overflow-y: auto;">
+                        <blockquote id="email-knote-content" style="font-size: 12px; overflow:auto; text-overflow: ellipsis; white-space: nowrap;" contenteditable="true">
+                        </blockquote>
+                        </div>
+                        <div class="footer-box">
+                            <button type="Submit" class="knotable-button-full"> Send </button>
+                        </div>
+                        </fieldset>
+                    </form>
+
+                </div>
+            </div>
+            </div>
+
+            <div class="knotable-lightbox hidden" style="visibility: visible;" id="sync-knote-container">
+                <div class="knotable-lightbox-inner">
+                </div>
+                <div class="knotable-box knotable-box-large" style="padding:0px;border-radius:5px;overflow:hidden;     max-width: 400px;   min-height: 207px;">
+
+                    <div class="gmail-box-wrapper" style="  padding-top: 13px;">
+
+                        <h4 style="margin-left: 4%;">Sync Knotes To: </h4> <br />
+                        <ul>
+                                <li><input disabled="diabled" checked="checked" type="checkbox" name="checkboxG5" id="sync-knotable"  /><label style="padding-left: 8px;" for="sync-knotable" >Knotable: <span id="setting-user"> </span>'s Knotes from Chrome</label></li> <br />
+
+                                <li><input type="checkbox" name="checkboxG4" id="sync-gmail"   /><label style="padding-left: 8px;" for="sync-gmail" >Gmail: <a target="_blank" id="setting-gmail-link" href="https://mail.google.com/mail/u/0/#drafts"> Drafts </a> <span>(Beta) </span></label></li> <br />
+
+                                <li><input type="checkbox" name="checkboxG4" id="sync-dropbox"/><label style="padding-left: 8px;" for="sync-dropbox" >Dropbox: Note Instantly </span></label></li> <br />
+                        </ul>
+
+                        <div class="footer-box">
+                            <button style="background-color: white; color: grey; border: 1px solid rgb(238, 238, 238); border-radius: 4px; width: 20%; line-height: 2.2em; position: absolute; right: 306px; bottom: 15px; font-size: 15px; font-weight: 900;" class="knotable-button-full sync-close"> OK </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Intro Box starts here !-->
+            <div class="knotable-lightbox hidden" style="visibility: visible;" id="intro-box">
+                <div class="knotable-lightbox-inner">
+                </div>
+                <div class="knotable-box knotable-box-large" style="padding:0px;border-radius:5px;overflow:hidden;     max-width: 400px;   min-height: 207px;">
+
+                    <div class="gmail-box-wrapper" style="  padding-top: 13px;">
+<!--                         <div class="close-intro" style="  float: right; margin-top: -15px; margin-right: 7px; cursor: pointer;"> X </div> -->
+                        <div class="container-fluid">
+                            <div class="col-lg-6 col-sm-12 col-md-12" >
+                                <span class="knotable-logo-intro" style="  margin-top: 26%; margin-left: 20%;"></span>
+                                <span id="extension-version" style="margin-left: 50px;">v 3.0.4</span>
+                            </div>
+                            <div class="col-lg-6 col-sm-12 col-md-12" >
+                                <p><strong>New in this version: </strong></p>
+                                <ul style="list-style-type: disc; -webkit-padding-start: 20px;">
+                                    <li>cache / session error fixed</li>
+                                    <li>knote focus bug fixed</li>
+                                    <li>faster</li>
+                                </ul>
+
+                                <p> <strong> Coming Soon: </strong></p>
+                                <ul style="list-style-type: disc; -webkit-padding-start: 20px;">
+                                    <li>reconnect fix (login bug)</li>
+                                    <li>better syncing</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <!-- Intro Box Ends here !-->
+
+        </div>
+        </div>
+
+        <!-- <div class="white-screen"></div> -->
+            <script id="knote-template" type="text/x-handlebars-template">
+            <li data-knoteid="<%= knoteId %>" data-order="<%= order %>" data-timestamp="<%= timestamp %>" class="list-group-item list-knote">
+                <div class="body">
+                    <strong> <%= content.length ? (c = content.split('\n')[0], c.length < 25 ? c : c.substr(0, 23) + '...') : '' %> </strong>
+                </div>
+                <div class="date"> <%= new moment(updated_date || date).fromNow() %> </div>
+            </li>
+            </script>
+
+            <script id="new-knote-template" type="text/x-handlebars-template">
+                <li class="list-group-item list-knote new-knote active" style="margin-bottom: 0px;border:none;border-bottom: 1px solid #ddd"><div class="body" style="height: 18px"><strong>new</strong></div></li>
+            </script>
+
+
+        </body>
+    </html>

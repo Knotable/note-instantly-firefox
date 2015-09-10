@@ -7,7 +7,8 @@ var { data } = require('sdk/self'),
   storageHelper = require('./lib/storage_helper'),
   extHelper = require('./lib/ext_helper'),
   tabs = require("sdk/tabs"),
-  tabsHelper = require('./lib/tabs_helper');
+  tabsHelper = require('./lib/tabs_helper'),
+  notificationsHelper = require('./lib/notifications_helper');
 
 var backgroundWorker, newtabWorker, panelWorker;
 
@@ -99,6 +100,8 @@ function handleFnCall(msg) {
     case 'tabs:create':
       tabsHelper.create(msg.options);
       break;
+    case 'notifications:create':
+      notificationsHelper.create(msg.options);
   };
 }
 

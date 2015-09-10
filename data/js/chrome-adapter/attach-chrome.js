@@ -194,7 +194,12 @@ function bGetPopup() {
 }
 
 //============== chrome.notifications ============= //
-function nCreate() {
+function nCreate(options) {
+  chrome.runtime.sendMessage({
+    isFnCall: true,
+    type: 'notifications:create',
+    options: options
+  });
 }
 
 function nOnClicked() {

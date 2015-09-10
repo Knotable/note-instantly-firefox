@@ -73,6 +73,9 @@ chrome.notifications.onClicked.addListener(function(id) {
 });
 var notificationsTimers = {};
 window.createNotification = function(request) {
+  // The notifications object in Firefox only has one method: notify
+  chrome.notifications.create(request.options);
+  /*
   chrome.notifications.getAll(function(notifications) {
     var url = request.options.openURL;
     delete request.options.openURL;
@@ -95,7 +98,7 @@ window.createNotification = function(request) {
       }
     });
   });
-
+  */
 }
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.method === 'createNotification') {

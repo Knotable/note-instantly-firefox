@@ -1,17 +1,13 @@
-var self = require('sdk/self'),
-  data = self.data,
-  events = require("sdk/system/events"),
-  config = require("./package.json"),
-  tabs = require("sdk/tabs"),
-  { Page } = require("sdk/page-worker"),
+var { data } = require('sdk/self'),
   { ToggleButton } = require('sdk/ui/button/toggle'),
   { Panel } = require('sdk/panel'),
   { PageMod } = require("sdk/page-mod"),
-  { hasLoggedIn, getPanelScripts, getNewTabScripts, handleStorageRequest } = require('./lib/ext_helper'),
+  { Page } = require("sdk/page-worker"),
+  config = require("./package.json"),
+  storageHelper = require('./lib/storage_helper'),
+  extHelper = require('./lib/ext_helper'),
+  tabs = require("sdk/tabs"),
   tabsHelper = require('./lib/tabs_helper');
-
-// This setting doesn't work on ff that version>=41
-require("sdk/preferences/service").set('browser.newtab.url', data.url('newtab.html'));
 
 var backgroundWorker, newtabWorker, panelWorker;
 
@@ -20,6 +16,11 @@ initToggleButton();
 initBackground();
 
 initTabs();
+
+exports.onUnload = extHelper.onUnload;
+
+// It is loaded when it is installed, when it is enabled, or when Firefox starts
+exports.main = extHelper.main;
 
 //attachContentScript();
 
@@ -41,7 +42,7 @@ function initToggleButton() {
     contentURL: data.url('./views/browseraction-popup.html'),
     width: 280,
     height: 444,
-    contentScriptFile: getPanelScripts(),
+    contentScriptFile: extHelper.getPanelScripts(),
     contentScriptOptions: {
       extName: config.name,
       basePath: data.url('')
@@ -68,7 +69,7 @@ function initToggleButton() {
   panelWorker.port.on('storage', function(request) {
     console.log('=======> storage request from panel: ' + JSON.stringify(request));
     if (panelWorker) {
-      handleStorageRequest(request, function(response) {
+      storageHelper.handleStorageRequest(request, function(response) {
         panelWorker.port.emit('response:storage', response);
       });
     }
@@ -79,7 +80,7 @@ function initToggleButton() {
   }
 
   function handleToggleButtonChange(state) {
-    if(state.checked && hasLoggedIn()) {
+    if(state.checked && extHelper.hasLoggedIn()) {
       panelWorker.show({
         position: button
       });
@@ -143,7 +144,7 @@ function initBackground() {
   backgroundWorker.port.on('storage', function(request) {
     console.log('=======> storage request from background: ' + JSON.stringify(request));
     if (backgroundWorker) {
-      handleStorageRequest(request, function(response) {
+      storageHelper.handleStorageRequest(request, function(response) {
         backgroundWorker.port.emit('response:storage', response);
       });
     }
@@ -155,7 +156,7 @@ function initTabs() {
     if (tab.url == data.url('newtab.html')) {
       console.log('=======> newtab is ready.');
       newtabWorker = tab.attach({
-        contentScriptFile: getNewTabScripts(),
+        contentScriptFile: extHelper.getNewTabScripts(),
         contentScriptOptions: {
           extName: config.name,
           basePath: data.url('')
@@ -178,7 +179,7 @@ function initTabs() {
       newtabWorker.port.on('storage', function(request) {
         console.log('=======> storage request from newtab: ' + JSON.stringify(request));
         if (newtabWorker) {
-          handleStorageRequest(request, function(response) {
+          storageHelper.handleStorageRequest(request, function(response) {
             newtabWorker.port.emit('response:storage', response);
           });
         }
@@ -211,4 +212,3 @@ function pageMod(scriptUrls, when) {
   mod.include.add(newtabUrl);
   */
 }
-

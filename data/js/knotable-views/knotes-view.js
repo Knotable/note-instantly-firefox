@@ -332,11 +332,11 @@ var KnotesView = Backbone.View.extend({
 
        });
   },
-  _updateKnoteOnBackground: _.throttle(function(e){
+  _updateKnoteOnBackground: _.debounce(function(e){
     if(this.activeKnote){
       this._updateKnote();
     }
-  }, 2000),
+  }, 2 * 60 * 1000),
 
   updateKnoteText: function(e) {
     var textarea = $(e.currentTarget);
@@ -356,7 +356,7 @@ var KnotesView = Backbone.View.extend({
         'content': val || 'new',
         'updated_date': new Date()
       });
-
+      this._updateKnoteOnBackground();
       this.activeKnote.trigger('activate', true);
     }
   },

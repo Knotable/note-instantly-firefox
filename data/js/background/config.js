@@ -1,6 +1,6 @@
 'use strict';
 // Mode
-var runtime_mode = "dev";
+var runtime_mode = "production";
 
 // Per-mode
 var env_domain_dev = "dev.knotable.com";

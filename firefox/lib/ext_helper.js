@@ -68,7 +68,7 @@ function getNewTabScripts() {
     scripts[i] = data.url(scripts[i]);
   }
 
-  scripts.push('https://apis.google.com/js/client.js?onload=GoogleOauthHelper.handleClientLoad');
+  //scripts.push('https://apis.google.com/js/client.js?onload=GoogleOauthHelper.handleClientLoad');
 
   return scripts;
 }

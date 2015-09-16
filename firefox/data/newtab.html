@@ -12,7 +12,6 @@
 
         <link type="text/css" rel="stylesheet" href="css/jquery-ui.min.css">
         <link type="text/css" rel="stylesheet" href="css/jquery-ui.theme.css">
-
     </head>
     <body id="background-grad">
         <img class="background-img"></img>
@@ -154,7 +153,7 @@
 
                                 <!-- li><input type="checkbox" name="checkboxG4" id="sync-gmail"   /><label style="padding-left: 8px;" for="sync-gmail" >Gmail: <a target="_blank" id="setting-gmail-link" href="https://mail.google.com/mail/u/0/#drafts"> Drafts </a> <span>(Beta) </span></label></li> <br / -->
 
-                                <li><input type="checkbox" name="checkboxG4" id="sync-dropbox"/><label style="padding-left: 8px;" for="sync-dropbox" >Dropbox: Note Instantly </span></label></li> <br />
+                                <li><input type="checkbox" name="checkboxG4" id="sync-dropbox"/><label style="padding-left: 8px;" for="sync-dropbox" >Dropbox: Note Instantly </label></li> <br />
                         </ul>
 
                         <div class="footer-box">
@@ -202,11 +201,11 @@
 
         <!-- <div class="white-screen"></div> -->
             <script id="knote-template" type="text/x-handlebars-template">
-            <li data-knoteid="<%= knoteId %>" data-order="<%= order %>" data-timestamp="<%= timestamp %>" class="list-group-item list-knote">
+            <li data-knoteid="<%- knoteId %>" data-order="<%- order %>" data-timestamp="<%- timestamp %>" class="list-group-item list-knote">
                 <div class="body">
-                    <strong> <%= content.length ? (c = content.split('\n')[0], c.length < 25 ? c : c.substr(0, 23) + '...') : '' %> </strong>
+                    <strong> <%- content.length ? (c = content.split('\n')[0], c.length < 25 ? c : c.substr(0, 23) + '...') : '' %> </strong>
                 </div>
-                <div class="date"> <%= new moment(updated_date || date).fromNow() %> </div>
+                <div class="date"> <%- new moment(updated_date || date).fromNow() %> </div>
             </li>
             </script>
 

@@ -1,7 +1,7 @@
 {
   "title": "Knotes",
   "name": "note-instantly",
-  "version": "3.1.2",
+  "version": "0.0.1",
   "description": "Super fast notes from your New Tab window",
   "main": "main.js",
   "author": "Knotable",

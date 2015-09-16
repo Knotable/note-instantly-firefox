@@ -46,13 +46,13 @@ window.KnotableModels = function() {
       }).join("-");
     },
     _thumbnailTemplate: '<p><div' +
-    'class="thumbnail-wrapper thumbnail3 uploading-thumb" id="thumb-box-<%= index %>">' +
-    '<p id="thumb-box-status-<%= index %>"></p><div class="thumb img-wrapper">' +
+    'class="thumbnail-wrapper thumbnail3 uploading-thumb" id="thumb-box-<%- index %>">' +
+    '<p id="thumb-box-status-<%- index %>"></p><div class="thumb img-wrapper">' +
     '<span class="delete_file_ico">&nbsp;</span>' +
-    '<a href="<%= fileUrl %>" target="_blank">' +
+    '<a href="<%- fileUrl %>" target="_blank">' +
     '<span class="img-wrapper">' +
     '<span class="btn-close">' +
-    '</span><img class="thumb" src="<%= thumbURL || fileUrl %>" file_id="<%= fileId %>"' +
+    '</span><img class="thumb" src="<%- thumbURL || fileUrl %>" file_id="<%- fileId %>"' +
     ' width="176" style="max-width: 400px;"></span>' +
     '</a>' +
     '</div>' +

@@ -56,7 +56,7 @@ var KnotesView = Backbone.View.extend({
 
       } else {
 
-        setTimeout(function(){
+        window.setTimeout(function(){
 
           var currentWinID = 0;
           chrome.windows.onCreated.addListener(function(data){
@@ -74,7 +74,7 @@ var KnotesView = Backbone.View.extend({
                   window.clearInterval(pollTimer);
                   chrome.windows.remove(currentWinID, function(){})
 
-                  setTimeout(function(){
+                  window.setTimeout(function(){
                     $("#btn-email-knote").click();
                   }, 1000);
                 }
@@ -202,7 +202,7 @@ var KnotesView = Backbone.View.extend({
       self.$el.find("#knotes-list li").first().next().trigger("click");
     }
 
-    setTimeout(function(){
+    window.setTimeout(function(){
       if(self.$("#knotes-list").has('li').length === 0){
         $("#knote-edit-area").val("");
         self.createKnote();

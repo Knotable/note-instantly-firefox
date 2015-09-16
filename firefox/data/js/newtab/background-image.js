@@ -114,9 +114,9 @@
       setInterval(function() {
         self._setClock();
       }, 1000);
-      setTimeout(bootstrap, 500);
+      window.setTimeout(bootstrap, 500);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         self.requestNextImage();
       }, 1500);
     },
@@ -145,7 +145,7 @@
         $('img.background-img').css('visibility', 'visible');
         $('div.white-screen').css('opacity', 0);
 
-        setTimeout( function() {
+        window.setTimeout( function() {
           $('div.white-screen').remove();
         }, 1000 );
       });

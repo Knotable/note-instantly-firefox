@@ -84,7 +84,6 @@ function Knotable() {
   };
   var _setUserAvatar = function(link) {
     knoteClient.getUserInfo().then(function(contact) {
-      console.log('========> getUserInfo: ', contact);
 
       if(_.isEmpty(contact))
       return;

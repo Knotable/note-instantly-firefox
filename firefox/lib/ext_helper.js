@@ -1,6 +1,7 @@
 var data = require('sdk/self').data,
   ss = require('sdk/simple-storage'),
-  Service = require("sdk/preferences/service");
+  Service = require("sdk/preferences/service"),
+  winUtils = require('sdk/window/utils');
 
 function getPanelScripts() {
   var scripts = [
@@ -88,6 +89,10 @@ function onUnload(reason) {
   }
 }
 
+function getURLBar() {
+  return winUtils.getMostRecentBrowserWindow().document.getElementById('urlbar');
+}
+
 
 exports.main = main;
 exports.onUnload = onUnload;
@@ -95,4 +100,12 @@ exports.getNewTabScripts = getNewTabScripts;
 exports.getPanelScripts = getPanelScripts;
 exports.hasLoggedIn = function() {
   return !!ss.storage['topicId']
+};
+exports.getURLBar = getURLBar;
+exports.clearURLBarIfNewtab = function() {
+  var urlbar = getURLBar()
+  //window.gURLBar.value = '';
+  if (urlbar.value == data.url('newtab.html')) {
+    urlbar.value = '';
+  }
 };

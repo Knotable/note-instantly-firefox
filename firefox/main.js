@@ -156,8 +156,12 @@ function initBackground() {
 
 function initTabs() {
   tabs.on("ready", function(tab) {
-    if (tab.url == data.url('newtab.html')) {
-      console.log('=======> newtab is ready.');
+    var newtabUrl = data.url('newtab.html');
+    if (tab.url == newtabUrl) {
+      extHelper.clearURLBarIfNewtab();
+      tab.on('activate', function(tab) {
+        extHelper.clearURLBarIfNewtab();
+      });
       newtabWorker = tab.attach({
         contentScriptFile: extHelper.getNewTabScripts(),
         contentScriptOptions: {

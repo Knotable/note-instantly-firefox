@@ -5,7 +5,7 @@ var data = require('sdk/self').data,
 
 function getPanelScripts() {
   var scripts = [
-    'js/vendor/jquery.2.1.0.js',
+    'js/vendor/jquery-2.1.4.min.js',
     'js/vendor/moment-with-locales.min.js',
     'js/vendor/jquery-ui.min.js',
     'js/vendor/underscore-min.js',
@@ -23,7 +23,7 @@ function getPanelScripts() {
 
 function getNewTabScripts() {
   var scripts = [
-    'js/vendor/jquery.2.1.0.js',
+    'js/vendor/jquery-2.1.4.min.js',
     'js/vendor/moment-with-locales.min.js',
     'js/vendor/jquery-ui.min.js',
     'js/vendor/underscore-min.js',

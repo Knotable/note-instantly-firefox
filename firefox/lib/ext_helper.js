@@ -1,7 +1,8 @@
 var data = require('sdk/self').data,
   ss = require('sdk/simple-storage'),
   Service = require("sdk/preferences/service"),
-  winUtils = require('sdk/window/utils');
+  winUtils = require('sdk/window/utils'),
+  NewTabURL = require('resource:///modules/NewTabURL.jsm').NewTabURL;
 
 function getPanelScripts() {
   var scripts = [
@@ -76,13 +77,15 @@ function getNewTabScripts() {
 
 function main(options, callback) {
   // This setting doesn't work on ff that version>=41
-  Service.set('browser.newtab.url', data.url('newtab.html'));
+  //Service.set('browser.newtab.url', data.url('newtab.html'));
+  NewTabURL.override(data.url('newtab.html'));
 }
 
 function onUnload(reason) {
   console.log('!!!! onUnload : reason: ' + reason);
   if (reason == 'uninstall' || reason == 'disable') {
-    Service.set('browser.newtab.url', 'about:newtab');
+    NewTabURL.reset();
+    //Service.set('browser.newtab.url', 'about:newtab');
     for (var key in ss.storage) {
       delete ss.storage[key];
     }
@@ -90,6 +93,7 @@ function onUnload(reason) {
 }
 
 function getURLBar() {
+  //window.gURLBar.value = '';
   return winUtils.getMostRecentBrowserWindow().document.getElementById('urlbar');
 }
 
@@ -104,7 +108,6 @@ exports.hasLoggedIn = function() {
 exports.getURLBar = getURLBar;
 exports.clearURLBarIfNewtab = function() {
   var urlbar = getURLBar()
-  //window.gURLBar.value = '';
   if (urlbar.value == data.url('newtab.html')) {
     urlbar.value = '';
   }

@@ -6,10 +6,10 @@ var data = require('sdk/self').data,
 
 function getPanelScripts() {
   var scripts = [
-    'js/vendor/jquery-2.1.4.min.js',
-    'js/vendor/moment-with-locales.min.js',
-    'js/vendor/jquery-ui.min.js',
-    'js/vendor/underscore-min.js',
+    'js/vendor/jquery-2.1.4.js',
+    'js/vendor/moment-with-locales.js',
+    'js/vendor/jquery-ui.js',
+    'js/vendor/underscore.js',
     'js/chrome-adapter/attach-chrome.js',
     'js/newtab/knote-client.js',
     'js/browser-action/browserPopup.js'
@@ -24,10 +24,10 @@ function getPanelScripts() {
 
 function getNewTabScripts() {
   var scripts = [
-    'js/vendor/jquery-2.1.4.min.js',
-    'js/vendor/moment-with-locales.min.js',
-    'js/vendor/jquery-ui.min.js',
-    'js/vendor/underscore-min.js',
+    'js/vendor/jquery-2.1.4.js',
+    'js/vendor/moment-with-locales.js',
+    'js/vendor/jquery-ui.js',
+    'js/vendor/underscore.js',
     'js/vendor/backbone.js',
 
     'js/chrome-adapter/attach-chrome.js',
@@ -59,7 +59,7 @@ function getNewTabScripts() {
     'js/knotable-views/search-view.js',
     'js/knotable-views/knotableView-init.js',
 
-    'js/vendor/dropbox.min.js',
+    'js/vendor/dropbox.js',
     'js/newtab/dropbox.js',
     'js/newtab/google-analytics.js',
     'js/newtab/messageManager.js',

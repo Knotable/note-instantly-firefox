@@ -1,7 +1,7 @@
 {
   "title": "Knotes",
   "name": "note-instantly",
-  "version": "3.1.5",
+  "version": "3.1.6",
   "description": "Super fast notes from your New Tab window",
   "main": "main.js",
   "author": "Knotable",
@@ -13,9 +13,9 @@
   "background": {
     "persistent": true,
     "scripts": [
-      "js/vendor/jquery-2.1.4.min.js",
-      "js/vendor/underscore-min.js",
-      "js/vendor/moment.min.js",
+      "js/vendor/jquery-2.1.4.js",
+      "js/vendor/underscore.js",
+      "js/vendor/moment-with-locales.js",
       "js/vendor/ddp.js",
       "js/vendor/q.js",
       "js/chrome-adapter/attach-chrome.js",

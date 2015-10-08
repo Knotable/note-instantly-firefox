@@ -105,7 +105,10 @@
       console.log('===========> [set background failed]');
       this.resetToZero(res.status)
       this.always();
-      this.$el.css('background-image', 'url("/data/images/bg_0.png")').addClass('bg-image-0');
+      this.$el.css({
+        'background-image': 'url("/data/images/bg_0.png")',
+        'background-size': 'cover'
+      }).addClass('bg-image-0');
     },
 
     always: function() {

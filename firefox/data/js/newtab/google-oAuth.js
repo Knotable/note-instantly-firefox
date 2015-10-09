@@ -27,7 +27,9 @@ window.GoogleOauthHelper = (function(){
 
   exports.handleClientLoad = function() {
     gapi.client.setApiKey(_apiKey);
-    window.setTimeout(_checkAuth,1);
+    window.setTimeout(function() {
+      _checkAuth();
+    }, 1);
   };
 
   return exports;

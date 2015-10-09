@@ -117,7 +117,9 @@
       setInterval(function() {
         self._setClock();
       }, 1000);
-      window.setTimeout(bootstrap, 500);
+      window.setTimeout(function() {
+        bootstrap();
+      }, 500);
 
       window.setTimeout(function() {
         self.requestNextImage();

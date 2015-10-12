@@ -149,12 +149,17 @@
 	};
 
 	DDP.prototype._try_reconnect = function () {
+    var _this = this;
 		if (this._reconnect_count < RECONNECT_ATTEMPTS_BEFORE_PLATEAU) {
-			setTimeout(this.connect.bind(this), this._reconnect_incremental_timer);
+			setTimeout(function() {
+        _this.connect.bind(_this);
+      }, this._reconnect_incremental_timer);
 			this._reconnect_count += 1;
 			this._reconnect_incremental_timer += TIMER_INCREMENT * this._reconnect_count;
 		} else {
-			setTimeout(this.connect.bind(this), this._reconnect_incremental_timer);
+			setTimeout(function() {
+        _this.connect.bind(_this);
+      }, this._reconnect_incremental_timer);
 		}
 	};
 

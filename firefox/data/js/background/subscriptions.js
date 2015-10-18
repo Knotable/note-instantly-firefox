@@ -16,9 +16,36 @@ window.Subscriptions = (function(){
     if (topicId && topicId !== _topicId){
       _topicId = topicId;
       console.log("subscribe", topicId);
+      asteroid.subscribe('topic', topicId, true);
+      var containers = [
+        {name: 'main'},
+        {name: 'attachment'}
+      ];
+      asteroid.subscribe('topicKnotes', topicId, containers);
 
-      asteroid.subscribe('topic', topicId);
+      var topicCollection = asteroid.getCollection("topics");
+      var topicQuery = topicCollection.reactiveQuery({_id: topicId});
+      var currentTopic = topicQuery.result[0];
+
+      var renameTopic = _.throttle(function(topicCollection, currentTopic){
+        var subject = 'Knotes';
+        if (subject !== currentTopic.subject){
+          console.log("rename topic", currentTopic.subject, subject);
+          topicCollection.update(topicId, {subject: subject});
+        }
+      }, 5000);
+      if(currentTopic){
+        renameTopic(topicCollection, currentTopic);
+      } else {
+        console.log("currentTopic", currentTopic);
+        topicQuery.on('change', function(t){
+          renameTopic(topicCollection, topicQuery.result[0]);
+        });
+      }
+
       asteroid.subscribe('allRestKnotesByTopicId', topicId);
+      asteroid.subscribe('pinnedKnotesForTopic', topicId);
+
       _watchKnotes(knotesQuery);
     }
 
@@ -28,7 +55,9 @@ window.Subscriptions = (function(){
   var _sendCachedKnotes = function(knotesQuery){
     // send knotes from cache
     _.each(knotesQuery.result, function(knote){
-      _addedKnote(knote);
+      if(!knote.archived){
+        _addedKnote(knote);
+      }
     });
   };
 

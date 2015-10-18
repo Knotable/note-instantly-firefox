@@ -10,10 +10,10 @@ window.asteroid = (function(){
 
   exports.init = function(host){
     //localStorage.clear()
-    console.log("asteroid.init", arguments);
-
+    console.info("asteroid.init", arguments);
     asteroidDDP = new Asteroid(host);
     window.asteroidDDP = asteroidDDP;
+
 
     var onLogin = function(){
       console.log("user login");
@@ -42,7 +42,7 @@ window.asteroid = (function(){
         .ready
         .then(function() {
           return exports.call('getNewTabTopicId', {
-            subject: AccountHelper.getUsername() + '\'s' + ' Knotes from Firefox',
+            subject: 'Knotes',
             participator_account_ids: [AccountHelper.getAccountId()],
             permissions: ["read", "write", "upload"]
           }).result
@@ -108,17 +108,14 @@ window.asteroid = (function(){
     return asteroid.createUser(options);
   };
 
-
   exports.getTopicId = function() {
     return _topicId;
   };
-
 
   exports.getPadLink = function(){
     if (_topicId){
       Subscriptions.subscribeTopic(_topicId);
     }
-
     var topicsCollection = asteroid.getCollection('topics');
     var topicQuery = topicsCollection.reactiveQuery({});
     var config = getConfig(runtime_mode);
@@ -150,6 +147,9 @@ window.asteroid = (function(){
     return padLink;
   };
 
+  exports.getGoogleOauthToken = function(){
+    return asteroidDDP.call("getGoogleAccessToken", asteroidDDP.userId).result
+  };
 
   exports.loginWithToken = function(token){
     console.info("asteroid.loginWithToken", arguments);
@@ -185,8 +185,8 @@ window.asteroid = (function(){
 
 
   exports.subscribe = function(name, args) {
-    console.log("subscribe", name, args);
-    return asteroidDDP.subscribe(name, args);
+    console.log("subscribe", arguments);
+    return asteroidDDP.subscribe.apply(asteroidDDP, arguments);
   };
 
 
@@ -206,19 +206,42 @@ window.asteroid = (function(){
 
 
   exports.updateKnote = function(knoteId, item){
-    var knotes = asteroidDDP.getCollection("knotes")
+    var knotesCollection = asteroidDDP.getCollection("knotes");
     var htmlBody = item.htmlBody;
     var title = item.title;
     var options = {};
     options.htmlBody = htmlBody;
-    var now = Date.now()
+    var now = Date.now();
 
     if (title){
       options.title = title;
       options.updated_date = now;
-      return knotes.update(knoteId, options).remote
     } else if (item.order){
-      return knotes.update(knoteId, {order: item.order, updated_date: now}).remote;
+      options = {order: item.order, updated_date: now};
+    }
+
+    if (title || item.order){
+      var knoteQuery = knotesCollection.reactiveQuery({_id: knoteId});
+      console.log("Background Knotes:update", knoteId, knoteQuery.result, options, Boolean(knoteQuery.result));
+      if (_.isEmpty(knoteQuery.result)){
+      	var resultDeferred = Q.defer();
+        var delayChangeFn = _.once(function(){
+          console.log("Asteroid:updateKnote W", knoteId, options);
+          knotesCollection.update(knoteId, options).local.then(function(){
+            resultDeferred.resolve(knoteId);
+          }).fail(function(error){
+            resultDeferred.reject(error);
+          });
+        });
+        knoteQuery.on("change", function(kId){
+          delayChangeFn();
+          knoteQuery.off('change');
+        });
+        return resultDeferred.promise;
+      } else{
+        console.log("Asteroid:updateKnote I", knoteId, options);
+        return knotesCollection.update(knoteId, options).local;
+      }
     } else
     {
       return null;
@@ -227,26 +250,7 @@ window.asteroid = (function(){
 
 
   exports.removeKnote = function(knoteId){
-    // Server don't allow delete knote with content.
-    // So remove content of knote and then remove knote.
-    var deferred = new $.Deferred();
-    var knotes = asteroidDDP.getCollection("knotes");
-    knotes.update(knoteId, {htmlBody: '', file_ids: []})
-    .remote
-    .then(function(){
-      knotes.remove(knoteId)
-      .remote
-      .then(function(){
-        deferred.resolve(knoteId);
-      })
-      .fail(function(){
-        deferred.reject(error);
-      });
-    })
-    .fail(function(error){
-      deferred.reject(error);
-    })
-    return deferred.promise()
+    return asteroidDDP.call("markKnoteAsDone", knoteId).result
   };
 
 

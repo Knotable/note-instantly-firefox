@@ -7,7 +7,6 @@ var KnotesView = Backbone.View.extend({
     'click #btn-delete-knote': 'deleteKnote',
     'focus #knote-edit-area': 'ensureLoggingIn',
     //'keyup #knote-edit-area': 'updateKnoteText',
-    "click .new-knote": "newKnote",
     'focusout #knote-edit-area': 'saveCurrentKnote'
   },
   saveCurrentKnote: function(){
@@ -16,12 +15,6 @@ var KnotesView = Backbone.View.extend({
     } else {
       this._addNewKnote();
     }
-  },
-  newKnote: function(){
-    this.$el.find('textarea').val('').focus();
-    this.$el.find(".list-knote.active").removeClass("active");
-    this.$el.find(".new-knote").addClass("active");
-    this.activeKnote = null;
   },
   ensureLoggingIn: function() {
     console.log('======> [ensureLoggingIn]');

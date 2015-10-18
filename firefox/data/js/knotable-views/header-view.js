@@ -39,23 +39,9 @@ var HeaderView = Backbone.View.extend({
 
   _setKUrl: function(){
     var self = this;
-    var topicUrl = config.protocol + "://" + config.domain;
-    knoteClient.getTopicId().then(function(topicId) {
-      console.log('=====================> topicId :' + topicId);
-      if (!_.isEmpty(topicId)) {
-        topicUrl += "/t/0/" + topicId;
-        //chrome.storage.local.set({topicId: topicId});
-        //localStorage.topicId = topicId;
-        knoteClient.topicId = topicId;
-      } else {
-        //chrome.storage.local.remove('topicId');
-        //localStorage.topicId = null;
-        knoteClient.topicId = null;
-      }
-      self.$el.find('#newtab-topic-id').attr('href', topicUrl);
-    }).fail(function(){
-      self.$el.find('#newtab-topic-id').attr('href', topicUrl);
-    });
+    knoteClient.getPadLink().then(function(padLink){
+      self.$el.find('#newtab-topic-id').attr('href', padLink);
+    })
   },
 
   render: function() {

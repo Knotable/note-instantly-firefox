@@ -9,8 +9,8 @@ var KnotableMeteor = function() {
   var exports = {};
   var config = getConfig(runtime_mode);
 
-  exports.getTopicId = function(){
-    return asteroid.getTopicId();
+  exports.getPadLink = function(){
+    return asteroid.getPadLink();
   };
 
   exports.hasLoggedIn = function(){
@@ -46,6 +46,7 @@ var KnotableMeteor = function() {
     }
 
     exports.apply('updateNewTabTopicPosition', [data.topic_id, 300, 'ext:KnotableMeteor.addKnote']);
+
     return exports.call("add_knote", requiredKnoteParams, optionalKnoteParams);
   };
 

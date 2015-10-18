@@ -64,16 +64,16 @@ var onNotification = function(knotesView, request, sender, response) {
   var newKnote = request.knote;
   switch(request.msg){
     case 'addKnote':
-    _addKnoteOnView(knotesView, newKnote);
-    break;
+      _addKnoteOnView(knotesView, newKnote);
+      break;
     case 'updateKnote':
-    _addKnoteOnView(knotesView, newKnote);
-    break;
+      _addKnoteOnView(knotesView, newKnote);
+      break;
     case 'removeKnote':
-    _removeKnoteOnView(request.knoteId);
-    break;
+      _removeKnoteOnView(request.knoteId);
+      break;
     default:
-    return;
+      return;
   };
   console.log("knote message", request.msg, request.knoteId || request.knote._id + request.knote.title);
 };

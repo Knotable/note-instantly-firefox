@@ -124,7 +124,7 @@ function initBackground() {
   });
 
   backgroundWorker.port.on('msg', function(msg) {
-    console.log('=======> msg from background to ' + (msg.fromFrame || 'all') + ': ', msg);
+    console.log('=======> msg from background to ' + (msg.fromFrame == 'panel' ? 'panel' : 'newtab') + ': ', msg);
     if (msg && msg.args && msg.args.isFnCall) {
       handleFnCall(msg.args);
       return;
@@ -137,7 +137,7 @@ function initBackground() {
   });
 
   backgroundWorker.port.on('response:msg', function(msg) {
-    console.log('=======> response msg from background to ' + (msg.fromPanel ? 'panel' : 'newtab') + ': ', msg);
+    console.log('=======> response msg from background to ' + (msg.fromFrame == 'panel' ? 'panel' : 'newtab') + ': ', msg);
     var worker = getWorkerBackgroundTo(msg);
     if (worker) {
       msg.sender = {id: config.name};

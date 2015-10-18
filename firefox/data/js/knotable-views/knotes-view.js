@@ -1,24 +1,20 @@
 var KnotesView = Backbone.View.extend({
   el: '#knotes-container',
   events: {
-    'click #btn-add-knote': 'saveCurrentKnote',
+    'click #btn-save-knote': 'saveCurrentKnote',
     'click #btn-add-knote-plus': 'createKnote',
     'click #btn-email-knote': 'emailKnote',
     'click #btn-delete-knote': 'deleteKnote',
     'focus #knote-edit-area': 'ensureLoggingIn',
-    'keyup #knote-edit-area': 'updateKnoteText',
+    //'keyup #knote-edit-area': 'updateKnoteText',
     "click .new-knote": "newKnote",
-    'focusout #knote-edit-area': 'updateKnoteOutFocus'
+    'focusout #knote-edit-area': 'saveCurrentKnote'
   },
   saveCurrentKnote: function(){
-    this._updateKnoteOnActiveKnote();
-  },
-  updateKnoteOutFocus: function(){
-    this._updateKnoteOnActiveKnote();
-  },
-  _updateKnoteOnActiveKnote: function(){
     if(this.activeKnote){
       this._updateKnote();
+    } else {
+      this._addNewKnote();
     }
   },
   newKnote: function(){
@@ -120,7 +116,7 @@ var KnotesView = Backbone.View.extend({
         "subject":"",
         "body":"",
         "htmlBody":$("#knote-edit-area").val().trim(),
-        "topic_id":knoteClient.topicId
+        "topic_id": knoteClient.topicId
       };
 
       var matchedKnotes = _.findWhere(self.offlineCreateKnotes, {'localID':knote.localID});
@@ -147,8 +143,6 @@ var KnotesView = Backbone.View.extend({
     this.$el.find("#knotes-list").prepend(this.tmpl);
   },
   createKnote: function(content) {
-    this._addEmptyKnote();
-
     if(this.activeKnote){
       this._updateKnote();
       this.activeKnote = null;
@@ -157,31 +151,9 @@ var KnotesView = Backbone.View.extend({
         $(".list-knote.active").attr("data-knoteLocalId", random)
         this.localKnoteID = random;
       }
-      return null;
     }
 
-    if (!(content && _.isString(content))) {
-      content = this._getEditAreaContent();
-    }
-
-    if(_.isEmpty(content)){
-      return null;
-    }
-    var nextOrder = _.min(this.collection.pluck('order'));
-    if (!isFinite(nextOrder)) nextOrder = 1;
-    var newKnote = new KnoteModel({
-      order: nextOrder - 1,
-      content: content,
-      topicId: knoteClient.topicId
-    });
-    newKnote.save();
-    this.collection.add(newKnote);
-    this.setActiveKnote(newKnote);
-
-    this.$el.find(".list-knote.new-knote").remove();
-
-    googleAnalyticsHelper.trackAnalyticsEvent('knote', 'created');
-
+    this._addEmptyKnote();
   },
   deleteKnote: function() {
     var self = this;
@@ -338,6 +310,35 @@ var KnotesView = Backbone.View.extend({
     }
   }, 2 * 60 * 1000),
 
+  _addNewKnote: function() {
+    var content = $('#knote-edit-area').val().trim();
+    if(!_.isEmpty(content)){
+      if (!(content && _.isString(content))) {
+        content = this._getEditAreaContent();
+      }
+
+      if(_.isEmpty(content)){
+        return null;
+      }
+      var nextOrder = _.min(this.collection.pluck('order'));
+      if (!isFinite(nextOrder)) nextOrder = 1;
+      var newKnote = new KnoteModel({
+        order: nextOrder - 1,
+        content: content,
+        topicId: knoteClient.topicId
+      });
+      newKnote.save().done(function(knoteId) {
+        console.log('=======> newKnote.save | Id: ', knoteId);
+      });
+      this.collection.add(newKnote);
+      this.setActiveKnote(newKnote);
+
+      this.$el.find(".list-knote.new-knote").remove();
+
+      googleAnalyticsHelper.trackAnalyticsEvent('knote', 'created');
+    }
+  },
+
   updateKnoteText: function(e) {
     var textarea = $(e.currentTarget);
     var val = textarea.val().trim();
@@ -346,18 +347,16 @@ var KnotesView = Backbone.View.extend({
       this._updateKnoteOffline();
     }
 
-    if (!this.activeKnote)
-    {
-      if(!_.isEmpty(val)){
-        this.createKnote(val);
-      }
-    } else {
+    if (this.activeKnote) {
       this.activeKnote.set({
         'content': val || 'new',
         'updated_date': new Date()
       });
       this._updateKnoteOnBackground();
+      console.log('********** activeKnote');
       this.activeKnote.trigger('activate', true);
+    } else {
+      this._addNewKnote(val);
     }
   },
 
@@ -389,8 +388,10 @@ var KnotesView = Backbone.View.extend({
   _updateKnote: function(){
     var options = this._getUpdateOptions();
     var knoteId = this.activeKnote.get("_id") || this.activeKnote.get("knoteId");
-    console.log("update knote", options, knoteId, this.activeKnote);
+    //console.log("update knote", options, knoteId, this.activeKnote);
     var knoteHasChanged = true;
+    console.log('old title: ', this.activeKnote.get("title"));
+    console.log('old body: ', this.activeKnote.get("htmlBody"));
     if (options.title === this.activeKnote.get("title") && options.htmlBody === this.activeKnote.get("htmlBody")){
       knoteHasChanged = false;
     }

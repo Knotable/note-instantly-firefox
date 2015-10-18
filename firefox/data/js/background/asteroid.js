@@ -49,6 +49,10 @@ window.asteroid = (function(){
           .then(function(topicId) {
             _topicId = topicId;
             console.log("subscribe topic", topicId);
+            chrome.runtime.sendMessage({
+              msg: 'topicId',
+              topicId: topicId
+            });
             chrome.storage.local.set({'topicId': topicId});
             Subscriptions.subscribeTopic(topicId);
           });
@@ -105,11 +109,45 @@ window.asteroid = (function(){
   };
 
 
-  exports.getTopicId = function(){
+  exports.getTopicId = function() {
+    return _topicId;
+  };
+
+
+  exports.getPadLink = function(){
     if (_topicId){
       Subscriptions.subscribeTopic(_topicId);
     }
-    return _topicId;
+
+    var topicsCollection = asteroid.getCollection('topics');
+    var topicQuery = topicsCollection.reactiveQuery({});
+    var config = getConfig(runtime_mode);
+    var padLink = config.protocol + "://" + config.domain;
+
+    if(!_.isEmpty(topicQuery.result)){
+      var topic = topicQuery.result[0];
+      if (topic && topic.uniqueNumber){
+        var encodeNumberToShortHash = function(uniqueNumber) {
+          var ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split('');
+          var ALPHABET_LENGTH = ALPHABET.length;
+
+          var urlHash;
+          if (uniqueNumber === 0) {
+            return ALPHABET[uniqueNumber];
+          }
+          urlHash = "";
+          while (uniqueNumber > 0) {
+            urlHash += ALPHABET[uniqueNumber % ALPHABET_LENGTH];
+            uniqueNumber = parseInt(uniqueNumber / ALPHABET_LENGTH, 10);
+          }
+          return urlHash.split("").reverse().join("");
+        };
+
+        padLink += '/p/' + topic._id.slice(0,2) + encodeNumberToShortHash(topic.uniqueNumber);
+      }
+    }
+
+    return padLink;
   };
 
 
@@ -178,8 +216,7 @@ window.asteroid = (function(){
     if (title){
       options.title = title;
       options.updated_date = now;
-      return knotes.update(knoteId, options)
-      .remote
+      return knotes.update(knoteId, options).remote
     } else if (item.order){
       return knotes.update(knoteId, {order: item.order, updated_date: now}).remote;
     } else

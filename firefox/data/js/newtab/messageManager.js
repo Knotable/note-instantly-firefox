@@ -33,19 +33,21 @@ window.MessageManager = (function(){
     // console.info("Message from background", message);
     switch(message.msg){
       case 'logout':
-      _onLogout();
-      break;
+        _onLogout();
+        break;
       case "login":
-      _onLogin();
-      break;
+        _onLogin();
+        break;
       case "connected":
-      _onConnected();
-      break;
+        _onConnected();
+        break;
       case "disconnected":
-      _onDisconnected();
-      break;
+        _onDisconnected();
+        break;
+      case "topicId":
+        knoteClient.topicId = message.topicId;
       default:
-      break;
+        break;
     };
   };
 

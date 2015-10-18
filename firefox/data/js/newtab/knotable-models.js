@@ -143,7 +143,7 @@ window.KnotableModels = function() {
           return self.save();
         }
         console.debug('update knote metadata', data);
-        console.log('=======> knoteClient.topicId: ', knoteClient.topicId);
+        console.log('=======> topicId: ', knoteClient.topicId);
         knoteClient.apply('updateNewTabTopicPosition', [knoteClient.topicId, 300, 'ext:Knotes.update']).then(function(data){
           console.log('NewTab Pad position updated')
         });

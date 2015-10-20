@@ -1,33 +1,18 @@
-var getContentAsText = function(html) {
-  if ($.isArray(html)) {
-    html = html[0];
-  }
-  var text = html;
-  try {
-    var elm = $('<div></div>');
-    elm.append(html);
-    if (elm && elm.length) {
-      text = elm.text();
-    }
-  } catch (e) {
-    console.error(e);
-  }
-  return text.trim();
-
-};
-
 var _addKnoteOnView = function(knotesView, newKnote) {
   var knote = knotesView.collection.find(function(model) {
     return (model.get('knoteId') === newKnote._id);
   });
 
   var knoteBody = '';
-  if(!_.isEmpty(newKnote.title))
-  knoteBody += newKnote.title;
+  if(!_.isEmpty(newKnote.title)) {
+    knoteBody += newKnote.title;
+  }
 
-  if (!_.isEmpty(newKnote.htmlBody) || !_.isEmpty(newKnote.body))
-  knoteBody += "\n\n" + newKnote.htmlBody || newKnote.body || '';
-  var content = getContentAsText(knoteBody) || 'new';
+  if (!_.isEmpty(newKnote.htmlBody) || !_.isEmpty(newKnote.body)) {
+    knoteBody += "<br class='split-body-br'>" + newKnote.htmlBody || newKnote.body || '';
+  }
+
+  var content = knoteBody || 'new';
 
   if (!knote) {
     knote = new KnoteModel(newKnote);

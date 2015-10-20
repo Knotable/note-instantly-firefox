@@ -19,11 +19,8 @@ var KnoteView = Backbone.View.extend({
     // console.log($(e.currentTarget))
     // console.log("$$$$$$$$$$$$$$$$$")
 
-    if(window._knotesView.activeKnote)
-    var knoteId = window._knotesView.activeKnote.attributes._id;
-    else
-    var knoteId = undefined;
-    var options = window._knotesView._getUpdateOptions();
+    var knoteId = window._knotesView.activeKnote ? window._knotesView.activeKnote.attributes._id : undefined;
+    var options = KnoteHelper.getUpdateOptions($("#knote-edit-area"));
 
     if(knoteId){
       window._knotesView._showSyncLoader();

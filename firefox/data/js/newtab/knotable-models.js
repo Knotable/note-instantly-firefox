@@ -21,6 +21,8 @@ window.KnotableModels = function() {
     },
     _getKnoteData: function() {
       var to_emails = this.get("to");
+      var options = KnoteHelper.getUpdateOptions($('#knote-edit-area'));
+      
       if (to_emails && to_emails.length) {
         to_emails = to_emails.map(function(emailAddress) {
           return emailAddress.replace(/^(.*?)</, '').replace(/>$/, '');
@@ -33,9 +35,10 @@ window.KnotableModels = function() {
         order: isFinite(this.get("order")) ? this.get("order") : void 0,
         from: this.get("from_email"),
         editors: this.get('editors'),
-        title: this.get('title'),
+        title: options.title,
         message_subject: this.get("subject"),
         body: this.get("content_html") || this.get('body'),
+        htmlBody: options.htmlBody,
         to: to_emails
       };
     },
@@ -46,35 +49,21 @@ window.KnotableModels = function() {
       }).join("-");
     },
     _thumbnailTemplate: '<p><div' +
-    'class="thumbnail-wrapper thumbnail3 uploading-thumb" id="thumb-box-<%- index %>">' +
-    '<p id="thumb-box-status-<%- index %>"></p><div class="thumb img-wrapper">' +
-    '<span class="delete_file_ico">&nbsp;</span>' +
-    '<a href="<%- fileUrl %>" target="_blank">' +
-    '<span class="img-wrapper">' +
-    '<span class="btn-close">' +
-    '</span><img class="thumb" src="<%- thumbURL || fileUrl %>" file_id="<%- fileId %>"' +
-    ' width="176" style="max-width: 400px;"></span>' +
-    '</a>' +
-    '</div>' +
-    '</div>&nbsp;</p>',
+      'class="thumbnail-wrapper thumbnail3 uploading-thumb" id="thumb-box-<%- index %>">' +
+      '<p id="thumb-box-status-<%- index %>"></p><div class="thumb img-wrapper">' +
+      '<span class="delete_file_ico">&nbsp;</span>' +
+      '<a href="<%- fileUrl %>" target="_blank">' +
+      '<span class="img-wrapper">' +
+      '<span class="btn-close">' +
+      '</span><img class="thumb" src="<%- thumbURL || fileUrl %>" file_id="<%- fileId %>"' +
+      ' width="176" style="max-width: 400px;"></span>' +
+      '</a>' +
+      '</div>' +
+      '</div>&nbsp;</p>',
     save: function() {
       var defer = new $.Deferred();
       var self = this,
       data = _.extend(this.toJSON(), this._getKnoteData());
-
-      var content = $('#knote-edit-area').val().trim();
-
-      var contentArray = _.compact(content.split('\n'));
-      var body, title;
-      if (contentArray.length > 1){
-        title = contentArray[0];
-        body = content.slice(title.length).trim();
-      } else {
-        title = content;
-        body = ''
-      }
-      data.title = title;
-      data.htmlBody = body;
 
       console.log("body", data);
 

@@ -12,6 +12,7 @@ function getPanelScripts() {
     'js/vendor/underscore.js',
     'js/chrome-adapter/attach-chrome.js',
     'js/newtab/knote-client.js',
+    'js/newtab/knote_helper.js',
     'js/browser-action/browserPopup.js'
   ];
 
@@ -39,6 +40,7 @@ function getNewTabScripts() {
     'js/newtab/google-oAuth.js',
 
     'js/newtab/sync-helper.js',
+    'js/newtab/knote_helper.js',
     'js/newtab/update-helper.js',
 
     'js/newtab/background-image.js',

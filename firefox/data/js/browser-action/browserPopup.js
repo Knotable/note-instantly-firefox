@@ -6,10 +6,6 @@ var browserActionPopup = (function ($) {
   window.currentKnote = null;
   window.inProcess = false;
 
-  var getTitle = function(){
-
-  };
-
   var initPopup = function(){
     chrome.storage.local.get(['currentKnoteID', 'currentKnoteText'], function(items) {
       console.log('=====> initPopup: ', items);

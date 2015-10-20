@@ -64,9 +64,9 @@
 
                                     <div class="panel">
                                         <div class="panel-body">
-                                            <textarea id="knote-edit-area" placeholder="Enter a note"></textarea>
+                                            <div id="knote-edit-area" contenteditable='true' placeholder="Enter a note"></div>
                                         </div>
-                                        <div class="">
+                                        <div class="knote-actions">
                                             <div class="pull-left">
                                                 <button class="btn btn-clear" id="btn-save-knote">
                                                     <i class="glyphicon glyphicon-floppy-disk"></i>
@@ -199,7 +199,7 @@
             <script id="knote-template" type="text/x-handlebars-template">
             <li data-knoteid="<%- knoteId %>" data-order="<%- order %>" data-timestamp="<%- timestamp %>" class="list-group-item list-knote">
                 <div class="body">
-                    <strong> <%- content.length ? (c = content.split('\n')[0], c.length < 25 ? c : c.substr(0, 23) + '...') : '' %> </strong>
+                    <strong> <%- KnoteHelper.getTitleForUI(this) %> </strong>
                 </div>
                 <div class="date"> <%- new moment(updated_date || date).fromNow() %> </div>
             </li>

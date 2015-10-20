@@ -39,6 +39,7 @@ window.KnotableModels = function() {
         message_subject: this.get("subject"),
         body: this.get("content_html") || this.get('body'),
         htmlBody: options.htmlBody,
+        content: options.htmlBody,
         to: to_emails
       };
     },

@@ -49,10 +49,6 @@ window.asteroid = (function(){
           .then(function(topicId) {
             _topicId = topicId;
             console.log("subscribe topic", topicId);
-            chrome.runtime.sendMessage({
-              msg: 'topicId',
-              topicId: topicId
-            });
             chrome.storage.local.set({'topicId': topicId});
             Subscriptions.subscribeTopic(topicId);
           });
@@ -71,7 +67,9 @@ window.asteroid = (function(){
       _topicId = null;
       //localStorage.clear();
       chrome.runtime.sendMessage({
-        msg: 'logout'
+        isFnCall: true,
+        //msg: 'logout'
+        type: 'logout'
       }, $.noop);
     };
     /**
@@ -117,11 +115,11 @@ window.asteroid = (function(){
       Subscriptions.subscribeTopic(_topicId);
     }
     var topicsCollection = asteroid.getCollection('topics');
-    var topicQuery = topicsCollection.reactiveQuery({});
+    var topicQuery = topicsCollection.reactiveQuery({_id: _topicId});
     var config = getConfig(runtime_mode);
     var padLink = config.protocol + "://" + config.domain;
 
-    if(!_.isEmpty(topicQuery.result)){
+    if(_topicId && !_.isEmpty(topicQuery.result)){
       var topic = topicQuery.result[0];
       if (topic && topic.uniqueNumber){
         var encodeNumberToShortHash = function(uniqueNumber) {

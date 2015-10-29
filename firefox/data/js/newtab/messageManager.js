@@ -46,6 +46,9 @@ window.MessageManager = (function(){
         break;
       case "topicId":
         knoteClient.topicId = message.topicId;
+        knoteClient.getPadLink().then(function(padLink){
+          $('#newtab-topic-id').attr('href', padLink);
+        });
       default:
         break;
     };

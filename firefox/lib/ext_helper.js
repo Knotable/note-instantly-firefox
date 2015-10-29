@@ -88,9 +88,14 @@ function onUnload(reason) {
   if (reason == 'uninstall' || reason == 'disable') {
     NewTabURL.reset();
     //Service.set('browser.newtab.url', 'about:newtab');
-    for (var key in ss.storage) {
-      delete ss.storage[key];
-    }
+    clearCache();
+  }
+}
+
+function clearCache() {
+  console.log('==========> clear cache!');
+  for (var key in ss.storage) {
+    delete ss.storage[key];
   }
 }
 
@@ -108,6 +113,7 @@ exports.hasLoggedIn = function() {
   return !!ss.storage['topicId']
 };
 exports.getURLBar = getURLBar;
+exports.clearCache = clearCache;
 exports.clearURLBarIfNewtab = function() {
   var urlbar = getURLBar()
   if (urlbar.value == data.url('newtab.html')) {

@@ -102,6 +102,8 @@ function handleFnCall(msg) {
       break;
     case 'notifications:create':
       notificationsHelper.create(msg.options);
+    case 'logout':
+      extHelper.clearCache();
   };
 }
 

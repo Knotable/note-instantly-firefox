@@ -16,7 +16,14 @@ window.Subscriptions = (function(){
     if (topicId && topicId !== _topicId){
       _topicId = topicId;
       console.log("subscribe", topicId);
-      asteroid.subscribe('topic', topicId, true);
+      asteroid.subscribe('topic', topicId, true)
+        .ready
+        .then(function() {
+          chrome.runtime.sendMessage({
+            msg: 'topicId',
+            topicId: topicId
+          });
+        });
       var containers = [
         {name: 'main'},
         {name: 'attachment'}

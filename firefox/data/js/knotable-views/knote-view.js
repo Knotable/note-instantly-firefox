@@ -13,30 +13,9 @@ var KnoteView = Backbone.View.extend({
     'click': 'focusKnote'
   },
   focusKnote: function(e) {
-
-    //window._knotesView.localKnoteID = $('.list-knote.active').attr("data-knotelocalid");
-    // console.log("$$$$$$$$$$$$$$$$$")
-    // console.log($(e.currentTarget))
-    // console.log("$$$$$$$$$$$$$$$$$")
-
-    var knoteId = window._knotesView.activeKnote ? window._knotesView.activeKnote.attributes._id : undefined;
-    var options = KnoteHelper.getUpdateOptions($("#knote-edit-area"));
-
-    if(knoteId){
-      window._knotesView._showSyncLoader();
-      knoteClient.updateKnote(knoteId, options)
-      .then(function(){
-        console.log("Update knote", knoteId, " Success!");
-        window._knotesView._hideSyncLoader();
-      })
-      .fail(function(){
-        console.error("Update knote", knoteId, " FAILED!");
-        window._knotesView._hideSyncLoader();
-      })
-    }
+    window._knotesView.saveCurrentKnote();
 
     window._knotesView.setActiveKnote(this.model);
-
   },
   initialize: function(model) {
     this.template = _.template($('#knote-template').html());

@@ -850,3 +850,15 @@ ul {
     content: attr(placeholder);
     display: block;
 }
+
+.tray-view #knotable-boxforgot_password,
+.tray-view #knotable-box-login {
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.tray-view #knotable-button-signup {
+  margin-bottom: 10px;
+}

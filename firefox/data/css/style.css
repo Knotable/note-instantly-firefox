@@ -857,6 +857,7 @@ ul {
   left: 0;
   height: 100%;
   width: 100%;
+  border-left: 0;
 }
 
 .tray-view #knotable-button-signup {

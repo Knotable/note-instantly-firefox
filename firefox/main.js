@@ -81,13 +81,9 @@ function initToggleButton() {
   }
 
   function handleToggleButtonChange(state) {
-    if(state.checked && extHelper.hasLoggedIn()) {
-      panelWorker.show({
-        position: button
-      });
-    } else {
-      handlePanelHide();
-    }
+    panelWorker.show({
+      position: button
+    });
   }
 }
 

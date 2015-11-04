@@ -10,9 +10,11 @@ function getPanelScripts() {
     'js/vendor/moment-with-locales.js',
     'js/vendor/jquery-ui.js',
     'js/vendor/underscore.js',
+    'js/vendor/backbone.js',
     'js/chrome-adapter/attach-chrome.js',
     'js/newtab/knote-client.js',
     'js/newtab/knote_helper.js',
+    'js/newtab/knotable-views.js',
     'js/browser-action/browserPopup.js'
   ];
 

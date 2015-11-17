@@ -60,7 +60,7 @@ var onNotification = function(knotesView, request, sender, response) {
     default:
       return;
   };
-  console.log("knote message", request.msg, request.knoteId || request.knote._id + request.knote.title);
+  console.log("knote message: ", request.msg, ', ', request.knoteId || request.knote._id, ', ', request.knote.title);
 };
 
 var bootstrap = function() {
@@ -93,18 +93,6 @@ $(document).ready(function() {
 
   $("#knote-sync-message").css("visibility", "hidden");
 
-  var _checkLoginForPopup = function(){
-    knoteClient.hasLoggedIn().then(function(loggedIn){
-      if(!loggedIn){
-        chrome.browserAction.setPopup({popup: ''});
-      } else {
-        chrome.browserAction.setPopup({popup: 'views/browseraction-popup.html'});
-      }
-    }).fail(function(){
-      chrome.browserAction.setPopup({popup: ''});
-    });
-  };
-  _checkLoginForPopup();
   if(navigator.onLine === true || !offlineMode.isOfflineMode){
         //return;
       offlineMode.syncOfflineKnotes();

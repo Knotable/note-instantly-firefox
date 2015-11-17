@@ -35,6 +35,10 @@ window.asteroid = (function(){
       chrome.runtime.sendMessage({
         msg: 'login'
       }, $.noop);
+      chrome.runtime.sendMessage({
+        isFnCall: true,
+        type: 'login'
+      }, $.noop);
 
       updateIcon(iconStates.loggedIn);
 
@@ -51,6 +55,10 @@ window.asteroid = (function(){
             console.log("subscribe topic", topicId);
             chrome.storage.local.set({'topicId': topicId});
             Subscriptions.subscribeTopic(topicId);
+            chrome.runtime.sendMessage({
+              msg: 'topicId',
+              topicId: topicId
+            });
           });
         });
     };
@@ -67,8 +75,10 @@ window.asteroid = (function(){
       _topicId = null;
       //localStorage.clear();
       chrome.runtime.sendMessage({
+        msg: 'logout'
+      }, $.noop);
+      chrome.runtime.sendMessage({
         isFnCall: true,
-        //msg: 'logout'
         type: 'logout'
       }, $.noop);
     };

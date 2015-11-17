@@ -100,6 +100,10 @@ function handleFnCall(msg) {
       notificationsHelper.create(msg.options);
     case 'logout':
       extHelper.clearCache();
+      extHelper.reloadPanel(panelWorker);
+    case 'login':
+      extHelper.reloadPanel(panelWorker);
+      extHelper.sendTopicId(newtabWorker);
   };
 }
 
@@ -159,6 +163,9 @@ function initTabs() {
       extHelper.clearURLBarIfNewtab();
       tab.on('activate', function(tab) {
         extHelper.clearURLBarIfNewtab();
+      });
+      tab.on('ready', function(tab) {
+        extHelper.sendTopicId(newtabWorker);
       });
       newtabWorker = tab.attach({
         contentScriptFile: extHelper.getNewTabScripts(),

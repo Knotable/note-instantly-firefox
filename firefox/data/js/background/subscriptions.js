@@ -11,7 +11,7 @@ window.Subscriptions = (function(){
   exports.subscribeTopic = function(topicId) {
     var knotes = asteroid.getCollection('knotes');
     var knotesQuery = knotes.reactiveQuery({topic_id: topicId});
-    console.log("knotesQuery", knotesQuery.result);
+    //console.log("knotesQuery", knotesQuery.result);
 
     if (topicId && topicId !== _topicId){
       _topicId = topicId;

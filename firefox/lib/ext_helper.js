@@ -1,4 +1,5 @@
 var data = require('sdk/self').data,
+  config = require("../package.json"),
   ss = require('sdk/simple-storage'),
   Service = require("sdk/preferences/service"),
   winUtils = require('sdk/window/utils'),
@@ -121,4 +122,19 @@ exports.clearURLBarIfNewtab = function() {
   if (urlbar.value == data.url('newtab.html')) {
     urlbar.value = '';
   }
+};
+exports.sendTopicId = function(worker) {
+  var topicId = ss.storage['topicId'];
+  if (topicId) {
+    worker.port.emit('msg', {
+      args: {
+        msg: 'topicId',
+        topicId: topicId,
+      },
+      sender: {id: config.name}
+    });
+  }
+};
+exports.reloadPanel = function(worker) {
+  worker.port.emit('reload');
 };

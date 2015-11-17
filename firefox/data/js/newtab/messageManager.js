@@ -45,6 +45,9 @@ window.MessageManager = (function(){
         _onDisconnected();
         break;
       case "topicId":
+        console.log('>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<');
+        console.log('>>>>>>>>>>>>>>>>>>>> topicId: ' + message.topicId + ' <<<<<<<<<<<<<<<<<<<<');
+        console.log('>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<');
         knoteClient.topicId = message.topicId;
         knoteClient.getPadLink().then(function(padLink){
           $('#newtab-topic-id').attr('href', padLink);

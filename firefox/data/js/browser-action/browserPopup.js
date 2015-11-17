@@ -1,5 +1,9 @@
 window.pageFrame = 'panel';
 
+self.port.on('reload', function() {
+  location.reload();
+});
+
 var log = function(msg) {
   return;
   var ta = $('#knote-textarea');

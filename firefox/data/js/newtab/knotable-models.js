@@ -66,32 +66,31 @@ window.KnotableModels = function() {
       var self = this,
       data = _.extend(this.toJSON(), this._getKnoteData());
 
-      console.log("body", data);
+      knoteClient.getTopicId().then(function(topicId) {
+        console.log("body", data);
+        data.topicId = topicId;
+        data.topic_id = topicId;
 
-      knoteClient.addKnote(data).then(function(knoteId) {
-        self.set("knoteId", knoteId);
-        defer.resolve(knoteId);
-        self.changed = false;
-      }).fail(function(err) {
-        self.trigger('fail', {
-          reason: 'Saving Knote failed',
-          error: err
+        if (!data.topicId) {
+          return;
+        }
+
+        knoteClient.addKnote(data).then(function(knoteId) {
+          self.set("knoteId", knoteId);
+          defer.resolve(knoteId);
+          self.changed = false;
+        }).fail(function(err) {
+          self.trigger('fail', {
+            reason: 'Saving Knote failed',
+            error: err
+          });
+          defer.reject(err);
         });
-        defer.reject(err);
       });
+
       return defer.promise();
     },
     destroy: function() {
-      var self = this;
-
-      knoteClient.getUserInfo().then(function(userInfo) {
-
-        if (!userInfo.account_id) return;
-
-        knoteClient.apply('updateNewTabTopicPosition', [knoteClient.topicId, 300, 'ext:Knotes.destroy']).then(function(data){
-          console.log('NewTab Pad position updated')
-        });
-      });
     },
     validate: function(attrs) {
       if (!attrs.content) return 'empty content';
@@ -129,14 +128,10 @@ window.KnotableModels = function() {
           $.Deferred().reject(self.validationError);
         }
         if (_.isEmpty(data) || !self.changed) return $.Deferred().reject('no Changes');
-        if (!self.get('topicId') || !self.get('knoteId')) {
+        if (!self.get('knoteId')) {
           return self.save();
         }
         console.debug('update knote metadata', data);
-        console.log('=======> topicId: ', knoteClient.topicId);
-        knoteClient.apply('updateNewTabTopicPosition', [knoteClient.topicId, 300, 'ext:Knotes.update']).then(function(data){
-          console.log('NewTab Pad position updated')
-        });
         return knoteClient.apply('update_knote_metadata', [self.get('knoteId'), data, 'ext:Knotes.update']);
       });
     }

@@ -126,7 +126,7 @@ function initBackground() {
   });
 
   backgroundWorker.port.on('msg', function(msg) {
-    console.log('=======> msg from background to ' + (msg.fromFrame == 'panel' ? 'panel' : 'newtab') + ': ', msg);
+    //console.log('=======> msg from background to ' + (msg.fromFrame == 'panel' ? 'panel' : 'newtab') + ': ', msg);
     if (msg && msg.args && msg.args.isFnCall) {
       handleFnCall(msg.args);
       return;
@@ -139,7 +139,7 @@ function initBackground() {
   });
 
   backgroundWorker.port.on('response:msg', function(msg) {
-    console.log('=======> response msg from background to ' + (msg.fromFrame == 'panel' ? 'panel' : 'newtab') + ': ', msg);
+    //console.log('=======> response msg from background to ' + (msg.fromFrame == 'panel' ? 'panel' : 'newtab') + ': ', msg);
     var worker = getWorkerBackgroundTo(msg);
     if (worker) {
       msg.sender = {id: config.name};
@@ -147,7 +147,7 @@ function initBackground() {
     }
   });
   backgroundWorker.port.on('storage', function(request) {
-    console.log('=======> storage request from background: ' + JSON.stringify(request));
+    //console.log('=======> storage request from background: ' + JSON.stringify(request));
     if (backgroundWorker) {
       storageHelper.handleStorageRequest(request, function(response) {
         backgroundWorker.port.emit('response:storage', response);

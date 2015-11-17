@@ -6,11 +6,8 @@ var runtime_mode = "production";
 var env_domain_dev = "dev.knotable.com";
 var protocol_dev = "http";
 
-//var env_server_prod = "firefox.lb.beta.knotable.com";
-//var env_domain_prod = "beta.knotable.com";
-var env_server_prod = "localhost:7000";
-var env_domain_prod = "localhost:7000";
-
+var env_server_prod = "firefox.lb.beta.knotable.com";
+var env_domain_prod = "beta.knotable.com";
 
 var env_server_staging = "c1.staging.knotable.com";
 var env_domain_staging = "staging.knotable.com";

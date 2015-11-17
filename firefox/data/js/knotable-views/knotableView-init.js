@@ -94,9 +94,9 @@ $(document).ready(function() {
   $("#knote-sync-message").css("visibility", "hidden");
 
   if(navigator.onLine === true || !offlineMode.isOfflineMode){
-        //return;
-      offlineMode.syncOfflineKnotes();
-      offlineMode.syncCreateKnotes();
+    //return;
+    offlineMode.syncOfflineKnotes();
+    offlineMode.syncCreateKnotes();
   }
 
   updateHelper.checkNewUpdate();

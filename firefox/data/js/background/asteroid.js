@@ -266,7 +266,7 @@ window.asteroid = (function(){
   exports.showData = function(){
     var knotes = asteroid.getCollection('knotes');
     var knotesQuery = knotes.reactiveQuery({})
-    console.log("knotes", knotesQuery.result);
+    //console.log("knotes", knotesQuery.result);
 
     var userAccount = asteroid.getCollection('user_accounts');
     var userAccountQuery = userAccount.reactiveQuery({})

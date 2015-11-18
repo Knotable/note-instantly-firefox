@@ -26,14 +26,8 @@ var _addKnoteOnView = function(knotesView, newKnote) {
     DropboxClient.syncKnote(newKnote);
     knotesView.collection.add(knote);
   } else {
-    // if the knote is currently edited, do nothing
-    var isActiveKnote = (function(activeKnote, newKnote) {
-      if (!activeKnote) return;
-      if (newKnote._id === activeKnote.get('knoteId')) return true;
-    })(_knotesView.activeKnote, newKnote);
     newKnote.content = content;
     DropboxClient.syncKnote(newKnote);
-    if (isActiveKnote) return;
     knote.set({content: content, order: newKnote.order, timestamp: newKnote.timestamp});
   }
 };

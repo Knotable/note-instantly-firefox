@@ -60,6 +60,13 @@ var KnoteView = Backbone.View.extend({
       this.setElement(newElm);
     }
 
+    var newContent = this.model.get('content');
+    var editArea = $('#knote-edit-area');
+    if (window._knotesView.activeKnote == this.model &&
+         newContent != editArea.html().trim()) {
+      editArea.html(newContent);
+    }
+
     return this;
   }
 });

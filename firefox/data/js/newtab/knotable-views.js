@@ -148,15 +148,15 @@ window.KnotableViews = function(events) {
       var email = this.$el.find('#recovery-email').val();
       if (!email) return;
       var self = this;
-      knoteClient.call('forgotPassword', [{
+      knoteClient.call('forgotPassword', {
         email: email
-      }])
+      })
       .then(function() {
         self.$el.find('#forget-password-submit-button').hide();
         self.setStatus('Email sent. Please check your email.')
       })
       .fail(function(err) {
-        self.setStatus(err);
+        self.setStatus(err.reason);
       });
     },
     show: function() {
@@ -195,6 +195,8 @@ window.KnotableViews = function(events) {
     signup: function(evt) {
       if (evt && evt.type === 'submit' && evt.preventDefault) evt.preventDefault();
       var self = this;
+      // TODO mark sign up source
+      //var signupFrom = 8; // kNoteInstantly
       var signupData = {};
       var data = {};
 
@@ -237,6 +239,7 @@ window.KnotableViews = function(events) {
 
       this.$el.find("#knotable-button-signup")[0].disabled = true;
       self.printStatus('');
+      //knoteClient.call('createAccount', signupData, null, false, false, signupFrom).then(function(userData) {
       knoteClient.call('createAccount', signupData).then(function(userData) {
         loginWithPassword(data.email, data.password)
         .then(function(a) {
@@ -381,6 +384,10 @@ window.KnotableViews = function(events) {
       });
     },
     login: function(evt) {
+      if(this.$el.find('#knotable-login-password').val() === "" || this.$el.find('#knotable-login-username').val().toLowerCase() === ""){
+        evt.preventDefault();
+        return false;
+      }
       var self = this;
       console.log('login form submitted');
       if (evt && evt.type === 'submit' && evt.preventDefault) evt.preventDefault();

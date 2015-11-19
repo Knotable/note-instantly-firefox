@@ -11,7 +11,7 @@ window.Subscriptions = (function(){
   exports.subscribeTopic = function(topicId) {
     var knotes = asteroid.getCollection('knotes');
     var knotesQuery = knotes.reactiveQuery({topic_id: topicId});
-    console.log("knotesQuery", knotesQuery.result);
+    //console.log("knotesQuery", knotesQuery.result);
 
     if (topicId && topicId !== _topicId){
       _topicId = topicId;
@@ -81,17 +81,16 @@ window.Subscriptions = (function(){
       if (knoteId.match('__upd__') && knote){
         _knoteId = knote._id;
         _updateKnote(knote);
-      } else if (knoteId.match('__del__')){
-        knoteId = knoteId.match(/(.*)__del__/)[1];
-        _removedKnoteId = knoteId;
-        _removedKnote(knoteId);
-      } else if(knote){
+      } else if (knote) {
         if(!_.contains([_removedKnoteId, _knoteId], knote._id)){
           _addedKnote(knote);
         } else {
           _removedKnoteId = null;
           _knoteId = null;
         }
+      } else {
+        _removedKnoteId = knoteId;
+        _removedKnote(knoteId);
       }
     });
   };

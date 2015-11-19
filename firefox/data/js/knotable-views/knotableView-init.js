@@ -26,14 +26,8 @@ var _addKnoteOnView = function(knotesView, newKnote) {
     DropboxClient.syncKnote(newKnote);
     knotesView.collection.add(knote);
   } else {
-    // if the knote is currently edited, do nothing
-    var isActiveKnote = (function(activeKnote, newKnote) {
-      if (!activeKnote) return;
-      if (newKnote._id === activeKnote.get('knoteId')) return true;
-    })(_knotesView.activeKnote, newKnote);
     newKnote.content = content;
     DropboxClient.syncKnote(newKnote);
-    if (isActiveKnote) return;
     knote.set({content: content, order: newKnote.order, timestamp: newKnote.timestamp});
   }
 };
@@ -60,7 +54,7 @@ var onNotification = function(knotesView, request, sender, response) {
     default:
       return;
   };
-  console.log("knote message", request.msg, request.knoteId || request.knote._id + request.knote.title);
+  console.log("knote message: ", request.msg, ', ', request.knoteId || request.knote._id, ', ', request.knote.title);
 };
 
 var bootstrap = function() {
@@ -93,22 +87,10 @@ $(document).ready(function() {
 
   $("#knote-sync-message").css("visibility", "hidden");
 
-  var _checkLoginForPopup = function(){
-    knoteClient.hasLoggedIn().then(function(loggedIn){
-      if(!loggedIn){
-        chrome.browserAction.setPopup({popup: ''});
-      } else {
-        chrome.browserAction.setPopup({popup: 'views/browseraction-popup.html'});
-      }
-    }).fail(function(){
-      chrome.browserAction.setPopup({popup: ''});
-    });
-  };
-  _checkLoginForPopup();
   if(navigator.onLine === true || !offlineMode.isOfflineMode){
-        //return;
-      offlineMode.syncOfflineKnotes();
-      offlineMode.syncCreateKnotes();
+    //return;
+    offlineMode.syncOfflineKnotes();
+    offlineMode.syncCreateKnotes();
   }
 
   updateHelper.checkNewUpdate();

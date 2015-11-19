@@ -8,6 +8,7 @@
       'loginWithPassword',
       'addKnote',
       "hasLoggedIn",
+      'getTopicId',
       "getPadLink",
       'removeKnote',
       'updateKnote',

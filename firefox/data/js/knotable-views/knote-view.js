@@ -13,9 +13,9 @@ var KnoteView = Backbone.View.extend({
     'click': 'focusKnote'
   },
   focusKnote: function(e) {
+    var self = this;
     window._knotesView.saveCurrentKnote();
-
-    window._knotesView.setActiveKnote(this.model);
+    window._knotesView.setActiveKnote(self.model);
   },
   initialize: function(model) {
     this.template = _.template($('#knote-template').html());
@@ -50,9 +50,22 @@ var KnoteView = Backbone.View.extend({
     this.$el[fn]();
   },
   render: function() {
-    var newElm = $(this.template(this.model.toJSON()));
-    this.$el.replaceWith(newElm);
-    this.setElement(newElm);
+    var id = this.model.get('knoteId') || this.model.get('_id');
+    if (this.$el.data('knoteid') == '' &&
+       id && id != 'true' && $('.list-knote[data-knoteid=' + id + ']').length) {
+      this.remove();
+    } else {
+      var newElm = $(this.template(this.model.toJSON()));
+      this.$el.replaceWith(newElm);
+      this.setElement(newElm);
+    }
+
+    var newContent = this.model.get('content');
+    var editArea = $('#knote-edit-area');
+    if (window._knotesView.activeKnote == this.model &&
+         newContent != editArea.html().trim()) {
+      editArea.html(newContent);
+    }
 
     return this;
   }

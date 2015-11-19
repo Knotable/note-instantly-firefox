@@ -13,6 +13,10 @@ var KnotableMeteor = function() {
     return asteroid.getPadLink();
   };
 
+  exports.getTopicId = function(){
+    return asteroid.getTopicId();
+  };
+
   exports.hasLoggedIn = function(){
     return asteroid.hasLoggedIn();
   };
@@ -45,7 +49,7 @@ var KnotableMeteor = function() {
       return;
     }
 
-    exports.apply('updateNewTabTopicPosition', [data.topic_id, 300, 'ext:KnotableMeteor.addKnote']);
+    exports.apply('updateNewTabTopicPosition', [requiredKnoteParams.topic_id, 300, 'ext:KnotableMeteor.addKnote']);
 
     console.log('======> add_knote: ', requiredKnoteParams, optionalKnoteParams);
     return exports.call("add_knote", requiredKnoteParams, optionalKnoteParams);

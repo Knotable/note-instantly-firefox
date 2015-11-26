@@ -16,7 +16,6 @@ var KnotesView = Backbone.View.extend({
     }
   },
   ensureLoggingIn: function() {
-    console.log('======> [ensureLoggingIn]');
     var self = this;
     knoteClient.hasLoggedIn().then(function(loggedIn){
       if(loggedIn){
@@ -170,20 +169,20 @@ var KnotesView = Backbone.View.extend({
     }, 200);
 
   },
+
   initialize: function(knotesCollection) {
     var self = this;
 
-    this.LoginView = window.knotable.getView('LoginView');
-    this.collection = knotesCollection;
+    self.LoginView = window.knotable.getView('LoginView');
+    self.collection = knotesCollection;
 
-    this.collection.on('add', this.onKnoteAdded, this);
-    this.collection.on('remove', this.onKnoteRemoved, this);
-    this.collection.on('change', this.onKnoteChanged, this);
-    this.collection.on('timeStampUpdate', this.onTimeStampUpdated, this);
+    self.collection.on('add', self.onKnoteAdded, self);
+    self.collection.on('remove', self.onKnoteRemoved, self);
+    self.collection.on('change', self.onKnoteChanged, self);
+    self.collection.on('timeStampUpdate', self.onTimeStampUpdated, self);
 
-    this.searchView = new SearchBoxView();
-    var self = this;
-    this.$el.find('#knotes-list').sortable({
+    self.searchView = new SearchBoxView();
+    self.$el.find('#knotes-list').sortable({
       containment: 'parent',
       items: 'li.list-group-item',
       stop: function(evt, ui) {
@@ -359,20 +358,20 @@ var KnotesView = Backbone.View.extend({
     if(knoteId && knoteHasChanged){
       this._showSyncLoader();
       knoteClient.updateKnote(knoteId, options)
-      .then(function(){
-        console.log("Update knote", knoteId, " Success!");
-        window._knotesView._hideSyncLoader();
-        if (_.isFunction(callback)) {
-          callback(true);
-        }
-      })
-      .fail(function(){
-        console.error("Update knote", knoteId, " FAILED!");
-        window._knotesView._hideSyncLoader();
-        if (_.isFunction(callback)) {
-          callback(false);
-        }
-      })
+        .then(function(){
+          console.log("Update knote", knoteId, " Success!");
+          window._knotesView._hideSyncLoader();
+          if (_.isFunction(callback)) {
+            callback(true);
+          }
+        })
+        .fail(function(){
+          console.error("Update knote", knoteId, " FAILED!");
+          window._knotesView._hideSyncLoader();
+          if (_.isFunction(callback)) {
+            callback(false);
+          }
+        });
     } else {
       if (_.isFunction(callback)) {
         callback(false);

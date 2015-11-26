@@ -1,7 +1,7 @@
 {
   "title": "Knotes",
   "name": "note-instantly",
-  "version": "3.1.11",
+  "version": "3.2.0",
   "description": "Super fast notes from your New Tab window",
   "main": "main.js",
   "author": "Knotable",
@@ -29,7 +29,7 @@
       "js/background/account-helper.js",
       "js/background/meteorDDP.js",
       "js/background/background.js",
-      "js/background/subscriptions.js",
+      "js/background/reactive_controller.js",
       "js/background/messageManager.js"
     ]
   },

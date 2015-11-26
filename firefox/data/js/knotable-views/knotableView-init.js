@@ -54,7 +54,7 @@ var onNotification = function(knotesView, request, sender, response) {
     default:
       return;
   };
-  console.log("knote message: ", request.msg, ', ', request.knoteId || request.knote._id, ', ', request.knote.title);
+  console.log("knote message: ", request.msg, ', ', request.knoteId || request.knote._id, ', ', request.knote && request.knote.title);
 };
 
 var bootstrap = function() {

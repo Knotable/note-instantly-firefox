@@ -1,11 +1,9 @@
 'use strict';
 
-var KnotableMeteor = function() {
+window.knoteServer = (function() {
   /*
   * Set K icon to inactive by default
   */
-  updateIcon(iconStates.loggedOut);
-
   var exports = {};
   var config = getConfig(runtime_mode);
 
@@ -61,7 +59,7 @@ var KnotableMeteor = function() {
 
   exports.addListKnote = function(data) {
     var params = {
-      id: localStorage.userId,
+      id: asteroid.userId,
       message_subject: data.subject || 'task',
       name: AccountHelper.getUsername(),
       from: data.from || AccountHelper.getEmail(),
@@ -121,6 +119,9 @@ var KnotableMeteor = function() {
     return asteroid.getCollection(pubName).reactiveQuery({}).result;
   };
 
+  exports.getGoogleOauthToken = function(){
+    return asteroid.getGoogleOauthToken();
+  };
 
   exports.getUserInfo = function() {
     if(asteroid.loggedIn){
@@ -130,8 +131,5 @@ var KnotableMeteor = function() {
     }
   };
 
-
-  asteroid.init(config.server);
   return exports;
-};
-//Meteor Connectione ends here
+})();

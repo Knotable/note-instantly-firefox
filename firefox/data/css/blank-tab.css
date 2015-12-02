@@ -272,12 +272,12 @@ a {
     opacity: 1;
 }
 
-.send-area input[type="text"]::-webkit-input-placeholder {
+.send-area input[type="text"]::-moz-placeholder {
     color: #fff;
     -webkit-transition: opacity 0.3s linear;
 }
 
-.send-area input[type="text"]:focus::-webkit-input-placeholder  {
+.send-area input[type="text"]:focus::-moz-placeholder  {
     opacity: 0;
 }
 
@@ -912,6 +912,10 @@ a#avatar-wrapper{
     border-bottom: 1px solid #ddd;
 }
 
+.knote-actions {
+    position: relative;
+}
+
 .knote-actions .btn:last-child {
     margin-right: 0px
 }
@@ -925,13 +929,14 @@ a#avatar-wrapper{
 
 .add-drop-down {
     position: absolute;
-    left: 0px;
+    left: 48px;
     bottom: 100%;
     border: solid 1px #ddd;
     padding: 0;
     border-radius: 2px;
     background: #fdfdfd;
     display: none;
+    cursor: pointer;
 }
 
 .add-drop-down li {
@@ -1061,11 +1066,12 @@ a:hover {
     margin: 0;
     width: 240px;
     overflow-x: hidden;
-    height: 20px;
-    min-height: 20px;
+    height: 25px;
+    min-height: 25px;
     outline: none;
     border: none;
-    resize: none
+    resize: none;
+    box-shadow: none;
 }
 
 #knote-list-title {
@@ -1073,8 +1079,8 @@ a:hover {
     margin-bottom: 12px;
 }
 
-#knote-list-title::-webkit-input-placeholder,
-#knote-add-list-textarea::-webkit-input-placeholder {
+#knote-list-title::-moz-placeholder,
+#knote-add-list-textarea::-moz-placeholder {
     color: #aaa;
     text-align: left
 }

@@ -6,7 +6,18 @@ var KnotesView = Backbone.View.extend({
     //'click #btn-email-knote': 'emailKnote',
     'click #btn-delete-knote': 'deleteKnote',
     'focus #knote-edit-area': 'ensureLoggingIn',
-    'focusout #knote-edit-area': 'saveCurrentKnote'
+    'focusout #knote-edit-area': 'saveCurrentKnote',
+
+    'keyup #knote-list-title': 'processList',
+    'click #add-list-item': 'addNewListItem',
+    "click .remove-list-item": "removeListItem",
+    'focus #knote-list-title': 'ensureLoggingIn',
+    'focus #knote-add-list-textarea': 'ensureLoggingIn',
+    'focusout #knote-list-title': function(){this.updateList(true)},
+    'change .list-checkbox': 'changeCheck',
+    'click #btn-list-knote': 'addListUI',
+    'click #btn-add-option': 'toggleAddDropdown',
+    'keyup #knote-add-list-textarea': 'listenTaskItemKey'
   },
   saveCurrentKnote: function(callback){
     if(this.activeKnote){
@@ -127,6 +138,8 @@ var KnotesView = Backbone.View.extend({
     });
   },
 
+
+
   _addEmptyKnote: function(){
     if ($(".active").hasClass("new-knote")) {
       return;
@@ -137,37 +150,44 @@ var KnotesView = Backbone.View.extend({
     this.tmpl = _.template($('#new-knote-template').html());
     this.$el.find("#knotes-list").prepend(this.tmpl);
   },
-  createKnote: function(content) {
+
+
+
+  createKnote: function(e) {
+    this.toggleListAreaView(false);
     this.activeKnote = false;
     this._addEmptyKnote();
   },
+
+
 
   deleteKnote: function() {
     var self = this;
     var knote = self.activeKnote;
     if (knote) {
       var knoteId = self.activeKnote.get('knoteId');
+      var currentKnote = self.$el.find("#knotes-list li[data-knoteid='"+knoteId+"']");
+      var nextKnote = currentKnote.next();
       console.log("delete Knote", knoteId);
-      knoteClient.removeKnote(knoteId)
-      .then(function(){
-        DropboxClient.removeKnote(knote);
-        self.collection.remove(knote);
-        self.$el.find("#knotes-list li").first().next().trigger("click");
-      }).fail(function(error){
-        console.log("long removeKnote", error);
-      });
-    }
-    else{
-      self.$el.find("#knotes-list li").first().next().trigger("click");
-    }
-
-    window.setTimeout(function(){
-      if(self.$("#knotes-list").has('li').length === 0){
-        $("#knote-edit-area").html("");
-        self.createKnote();
+      if (!nextKnote.length) {
+        nextKnote = currentKnote.prev();
       }
-    }, 200);
+      knoteClient.removeKnote(knoteId)
+        .then(function(){
+          DropboxClient.removeKnote(knote);
+          self.collection.remove(knote);
+          if(nextKnote.length){
+            nextKnote.click();
+          } else{
+            self.cleanAddingListArea();
+            $("#knote-edit-area").html("");
+            self.activeKnote = null;
+          }
+        }).fail(function(error){
+          console.log("- deleteKnote error ", error);
+        });
 
+    }
   },
 
   initialize: function(knotesCollection) {
@@ -214,16 +234,6 @@ var KnotesView = Backbone.View.extend({
             }
           })
         }
-        return
-        var knoteId = ui.item.attr("data-knoteid");
-        var options = {order: newOrder};
-        knoteClient.updateKnote(knoteId, options)
-        .then(function(){
-          console.log("Update knote", knoteId, " Success!");
-        })
-        .fail(function(){
-          console.error("Update knote", knoteId, " FAILED!");
-        });
       },
       start: function(evt, ui){
         var order = ui.item.attr("data-order");
@@ -233,7 +243,10 @@ var KnotesView = Backbone.View.extend({
     });
   },
 
+
+
   render: function() {
+    var self = this;
     this._syncGmailDraftsService();
     this._syncServerKnotes();
 
@@ -245,13 +258,22 @@ var KnotesView = Backbone.View.extend({
     this.$el.find("#knote-edit-area").focus();
     $("#knotes-list li:nth-child(1)").click();
 
+    $(document).click(function() {
+      self.hideAddDropDown();
+    });
+
     this.localKnoteID = this._randomLocalKnoteID();
+    KnoteHelper.setCursorOnContentEditable(this.$el.find('#knote-edit-area')[0])
     return this;
   },
+
+
 
   _clearOfflineKnotes: function(){
     chrome.storage.local.set({'offlineEditKnotes': []});
   },
+
+
 
   _updateKnoteOffline: function(){
      var self = this;
@@ -379,6 +401,8 @@ var KnotesView = Backbone.View.extend({
     }
   },
 
+
+
   _sortKnotesList: function(){
     var $knotes = this.$el.find('#knotes-list');
     var $knotesLi = $knotes.find("li");
@@ -411,6 +435,8 @@ var KnotesView = Backbone.View.extend({
     $knotesLi.detach().appendTo($knotes);
   },
 
+
+
   onKnoteAdded: function(model) {
     if ( model.get('archived') ) {
       return this;
@@ -425,27 +451,40 @@ var KnotesView = Backbone.View.extend({
     return this;
   },
 
+
+
   onKnoteRemoved: function(knote, collection, idx) {
     var self = this;
     knote.trigger('destroy');
-    this.setActiveKnote.bind(this, this.collection.models[idx.index - 1]);
+    self.setActiveKnote.bind(self, self.collection.models[idx.index - 1]);
   },
+
+
 
   onKnoteChanged: function(knote, collection, idx) {
     this._sortKnotesList();
   },
 
+
+
   _isEditableAreaEmpty: function(){
     return _.isEmpty(this._getEditAreaContent());
   },
 
+
+
   _getEditAreaContent: function(){
+    if(!this.$el.find("#knote-list-container").hasClass("hide")){
+      return this.$el.find("#knote-list-title").val().trim();
+    }
     return this.$el.find("#knote-edit-area").html().trim();
   },
 
+
+
   _removeKnoteIfEmptyContent: function(){
     var self = this;
-    if (self.activeKnote && self._isEditableAreaEmpty()){
+    if (self.activeKnote && self._isEditableAreaEmpty() && self.activeKnote.get("type") == "knote"){
       var knoteId = self.activeKnote.get("_id") || self.activeKnote.get("knoteId");
       var knoteCid = self.activeKnote.cid;
 
@@ -464,32 +503,50 @@ var KnotesView = Backbone.View.extend({
     }
   },
 
+
+
   setActiveKnote: function(id) {
     var activeKnote;
+    var self = this;
     if (id instanceof(KnoteModel)) {
       activeKnote = id;
     } else {
-      activeKnote = this.collection.findWhere({
+      activeKnote = self.collection.findWhere({
         knoteId: id
       });
     }
     if (!activeKnote) return;
-    this._removeKnoteIfEmptyContent();
-
-    this.activeKnote = activeKnote;
+    self._removeKnoteIfEmptyContent();
+    self.activeKnote = activeKnote;
     //this.$el.find(".new-knote.active").removeClass("active").addClass("hide");
-    $('.new-knote.active').remove();
+    self.$el.find('.new-knote.active').remove();
 
-    this.$el.find('#knote-edit-area').html(activeKnote.get('content')).focus();
+    if(activeKnote.get('type')=="checklist"){
+      self.cleanAddingListArea();
+      self.toggleListAreaView(true);
+      self.$el.find('#knote-list-title').val(activeKnote.get('title')).focus().removeClass("textarea_error").trigger('input');
+      var options = activeKnote.get('options');
+      if(typeof options != 'undefined') {
+        options.forEach(function(item, index){
+          self.addListItemToUI(item.name, item.checked, item.voters[0])
+        })
+      }
+    }else{
+      self.toggleListAreaView(false);
+      self.cleanAddingListArea();
+      self.$el.find('#knote-edit-area').html(activeKnote.get('content'));
+      KnoteHelper.setCursorOnContentEditable($('#knote-edit-area')[0]);
+    }
 
-    var self = this;
-    this.collection.each(function(model, collection) {
+    self.collection.each(function(model, collection) {
       model.trigger('activate', model === activeKnote);
     });
 
-    this.$el.find('#btn-email-knote,#btn-delete-knote').removeAttr('disabled');
-    return this.activeKnote;
+    self.$el.find('#btn-email-knote,#btn-delete-knote').removeAttr('disabled');
+    return self.activeKnote;
   },
+
+
 
   saveKnoteAsGmailDraft: function(){
     var self = this;
@@ -596,5 +653,248 @@ var KnotesView = Backbone.View.extend({
       });
 
     }, 15000);
+  },
+
+
+
+  processList: function(e){
+    var val = $(e.currentTarget).html().trim();
+    var self = this;
+    if(!self.activeKnote){
+      self.createList();
+    }else {
+      self.updateList(false);
+    }
+  },
+
+
+
+  createList: function(e){
+    var self = this;
+    knoteClient.getTopicId().then(function(topicId) {
+      var listData = KnoteHelper.getListData();
+      if(listData.title.length < 1) listData.title = 'Untitled';
+
+      var newKnote = new KnoteModel({
+        order: self.getNextOrder(false),
+        title: listData.title,
+        type: 'checklist',
+        topicId: topicId,
+        options: listData.options.length?listData.options:[]
+      });
+
+      newKnote.saveList();
+      self.collection.add(newKnote);
+      self.setActiveKnote(newKnote);
+      console.log("saved list knote and added to collection",newKnote);
+    });
+  },
+
+
+
+  // This function is for updating the title
+  updateList: function(immediate){
+    if(!this.activeKnote) return;
+    var listData = KnoteHelper.getListData();
+    var knoteId = this.activeKnote.get("_id") || this.activeKnote.get("knoteId");
+    var knoteType = this.activeKnote.get("type");
+    var isUpdated = false;
+    if(typeof knoteType != 'undefined' && knoteType == 'knote') return;
+    // If there is no change in title,
+    // Do not update
+    if(listData.title != this.activeKnote.get('title'))
+      isUpdated = true;
+
+    // If current update call is immediate & there is old pending update
+    // in processing under debounce, force to update current call
+    var oldTime = moment(this.activeKnote.get("updated_date")).valueOf();
+    var currentTime = moment().valueOf();
+    if(immediate &&  (currentTime - oldTime) < 4000 )
+      isUpdated = true;
+
+    if(!isUpdated) return;
+    // If title updated to empty & there are some list item exist,
+    // set item to untitled
+    if(listData.title == '' && listData.options.length > 0)
+      listData.title = 'Untitled'
+
+    // If there is no title and no list item, Remove empty list
+    if(listData.title == '' && listData.options.length < 1 && knoteId){
+      listData.title = 'Untitled'
+      // Temporary commenting the code to remove checklist & setting title = untitled.
+      // Permission for removing empty checklist is getting denied by web server,
+      // Update permissions on web server to Let allow clients to remove empty checklist,
+    }
+
+    this.activeKnote.set({
+      'title': listData.title,
+      'options': listData.options,
+      'updated_date': Date.now()
+    });
+
+    if(knoteId){
+      if(immediate){
+        this.updateListTitle(false); //  This will abort any debounced version of title update
+        knoteClient.updateList({case: "updateTitle", title: listData.title, knoteId: knoteId});
+      }else{
+        this.updateListTitle(knoteId, listData.title);
+      }
+    }
+  },
+
+
+
+  updateListTitle: _.debounce(function(knoteId, newTitle){
+    if(knoteId == false) return;
+    var options = {case: "updateTitle", title: newTitle, knoteId: knoteId};
+    knoteClient.updateList(options);
+  }, 4000),
+
+
+
+  getNextOrder: function(isMax){
+    var nextOrder;
+    if(isMax){
+      nextOrder = _.max(this.collection.pluck('order'));
+    }else{
+      nextOrder = _.min(this.collection.pluck('order'));
+    }
+    if (!isFinite(nextOrder)) nextOrder = 1;
+    return isMax? nextOrder + 1 : nextOrder - 1;
+  },
+
+
+
+  addNewListItem: function(){
+    var $item = $("#knote-add-list-textarea");
+    var val = $item.val().trim();
+    if(!val){
+      $item.addClass('textarea_error');
+      return null;
+    }else{
+      this.addListItemToUI(val, false);
+      $item.val('').removeClass('textarea_error').focus();
+      if(!this.activeKnote){
+        this.createList()
+      }else{
+        this.updateListItem();
+      }
+    }
+  },
+
+
+
+  removeListItem: function(e){
+    $(e.currentTarget).parents('.knote-added-list').remove();
+    this.updateListItem();
+  },
+
+
+
+  changeCheck: function(e){
+    var self = this;
+    var ele = $(e.currentTarget);
+    chrome.storage.local.get('contact', function (items) {
+      console.log(items['contact']);
+      var contact = items['contact'];
+      if(ele.prop('checked')){
+        ele.attr('data-checked-by', contact._id);
+      } else{
+        ele.attr('data-checked-by','');
+      }
+      self.updateListItem();
+    });
+  },
+
+
+
+  updateListItem: function(){
+    var options =  KnoteHelper.getListData();
+    this.activeKnote.set({
+      'title': options.title,
+      'options': options.options,
+      'updated_date': Date.now()
+    });
+    options.knoteId = this.activeKnote.get('knoteId');
+    options.case = "updateItems";
+    knoteClient.updateList(options);
+  },
+
+
+
+  addListUI: function(e){
+    this.cleanAddingListArea();
+    this.toggleListAreaView(true);
+    this.activeKnote = null;
+  },
+
+
+
+  toggleListAreaView: function(show){
+    if(show==true){
+      this.$el.find("#knote-edit-area").addClass("hide");
+      this.$el.find("#knote-list-container").removeClass('hide');
+      this.$el.find(".list-knote.new-knote").remove();
+      this.$el.find("#knote-list-title").removeClass("textarea_error").focus();
+    }else{
+      this.$el.find("#knote-list-container").addClass("hide");
+      this.$el.find("#knote-edit-area").removeClass('hide');
+    }
+  },
+
+
+
+  // TODO - Optimize this function
+  cleanAddingListArea: function(){
+    this.$el.find("#knote-list-title").removeClass("textarea_error").val('');
+    this.$el.find("#knote-add-list-textarea").val('');
+
+    this.$el.find(".knote-added-list").each(function(){
+      if($(this).attr('id') !='knote-main-list-item'){
+        $(this).remove();
+      }else{
+        $(this).find("label").html('');
+        $(this).find("input").prop("checked",false);
+      }
+    });
+    this.$el.find("#knote-main-list-item").addClass("hide");
+    this.$el.find("#knote-edit-area").html('').focus();
+    this.$el.find(".list-knote.active").removeClass("active");
+    this.$el.find(".list-knote.new-knote").addClass("active").removeClass("hide").find("strong").text("new");
+  },
+
+
+
+  addListItemToUI: function(val, checked, checkedBy){
+    var $item = $(".knote-added-list:first").clone();
+    $item.find(".knote-list-label").html(val);
+    $item.find(".list-checkbox").prop("checked", checked).attr('data-checked-by', checkedBy);
+    $item.attr('id','').removeClass('hide');
+    $("#knote-added-list-container").append($item).removeClass('hide');
+  },
+
+
+
+  toggleAddDropdown: function (e) {
+    e.stopPropagation();
+    $('.add-drop-down').slideToggle(200);
+  },
+
+
+
+  hideAddDropDown: function(){
+    setTimeout(function(){
+      $('.add-drop-down').slideUp(200);
+    }, 1);
+  },
+
+
+
+  listenTaskItemKey: function(e){
+    if(e.keyCode == 13 && e.shiftKey != true){
+      e.preventDefault();
+      this.addNewListItem();
+    }
   }
+
 });

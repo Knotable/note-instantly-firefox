@@ -13,6 +13,7 @@
   "background": {
     "persistent": true,
     "scripts": [
+      "js/background/config.js",
       "js/vendor/jquery-2.1.4.js",
       "js/vendor/underscore.js",
       "js/vendor/moment-with-locales.js",
@@ -25,7 +26,6 @@
       "js/background/asteroid.js",
 
       "js/background/logger.js",
-      "js/background/config.js",
       "js/background/account-helper.js",
       "js/background/meteorDDP.js",
       "js/background/background.js",

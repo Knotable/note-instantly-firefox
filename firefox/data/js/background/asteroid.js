@@ -5,6 +5,7 @@ window.asteroid = (function(){
   var asteroidDDP;
   var _topicId = null;
   var Subscriptions = [];
+  var config = getConfig(runtime_mode);
 
   exports.userId = null;
   exports.loggedIn = null;
@@ -126,7 +127,6 @@ window.asteroid = (function(){
     reactiveController.loadKnotesOnClient();
     var topicsCollection = asteroid.getCollection('topics');
     var topicQuery = topicsCollection.reactiveQuery({_id: _topicId});
-    var config = getConfig(runtime_mode);
     var padLink = config.protocol + "://" + config.domain;
 
     if(_topicId && !_.isEmpty(topicQuery.result)){
@@ -305,7 +305,6 @@ window.asteroid = (function(){
     knotes._localToRemoteUpdate(options.knoteId, updateOption);
   };
 
-
-
+  exports.init(config.server);
   return exports;
 })();

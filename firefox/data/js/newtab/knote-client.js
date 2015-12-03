@@ -7,13 +7,18 @@
       'logout',
       'loginWithPassword',
       'addKnote',
+      'addListKnote',
       "hasLoggedIn",
       'getTopicId',
       "getPadLink",
       'removeKnote',
       'updateKnote',
       'getCollection',
-      'getUserInfo'
+      'getUserInfo',
+      'getUserId',
+      'getGoogleOauthToken',
+      'updateList',
+      'draggingKnote'
     ];
 
     var sendMessage = function(fn, args) {

@@ -4,6 +4,8 @@ window.asteroid = (function(){
   var exports = {};
   var asteroidDDP;
   var _topicId = null;
+  var Subscriptions = [];
+  var config = getConfig(runtime_mode);
 
   exports.userId = null;
   exports.loggedIn = null;
@@ -16,7 +18,9 @@ window.asteroid = (function(){
 
 
     var onLogin = function(){
-      console.log("user login");
+      console.time("SubscriptionTime");
+      console.log("User loggedIn");
+
       var tokenName = asteroidDDP._host + "__" + asteroidDDP._instanceId + "__login_token__";
       chrome.storage.local.get(tokenName, function(items) {
         var token = items[tokenName];
@@ -42,25 +46,21 @@ window.asteroid = (function(){
 
       updateIcon(iconStates.loggedIn);
 
-      asteroidDDP.subscribe('userPrivateData')
-        .ready
-        .then(function() {
-          return exports.call('getNewTabTopicId', {
-            subject: 'Knotes',
-            participator_account_ids: [AccountHelper.getAccountId()],
-            permissions: ["read", "write", "upload"]
-          }).result
-          .then(function(topicId) {
-            _topicId = topicId;
-            console.log("subscribe topic", topicId);
-            chrome.storage.local.set({'topicId': topicId});
-            Subscriptions.subscribeTopic(topicId);
-            chrome.runtime.sendMessage({
-              msg: 'topicId',
-              topicId: topicId
-            });
+      var sub = asteroidDDP.subscribe('collectionsForChrome');
+      Subscriptions.push(sub);
+      sub.ready.then(function() {
+        console.timeEnd("SubscriptionTime");
+        var topic = asteroid.getCollection('topics').reactiveQuery({}).result;
+        if(topic.length){
+          _topicId = topic[0]._id;
+          chrome.storage.local.set({'topicId': topicId});
+          chrome.runtime.sendMessage({
+            msg: 'topicId',
+            topicId: _topicId
           });
-        });
+        }
+        reactiveController.loadKnotesOnClient();
+      });
     };
 
     var onLogout = function(){
@@ -74,6 +74,9 @@ window.asteroid = (function(){
       chrome.storage.local.remove('loginToken');
       _topicId = null;
       //localStorage.clear();
+      _.each(Subscriptions, function(sub){
+        sub.stop();
+      });
       chrome.runtime.sendMessage({
         msg: 'logout'
       }, $.noop);
@@ -121,12 +124,9 @@ window.asteroid = (function(){
   };
 
   exports.getPadLink = function(){
-    if (_topicId){
-      Subscriptions.subscribeTopic(_topicId);
-    }
+    reactiveController.loadKnotesOnClient();
     var topicsCollection = asteroid.getCollection('topics');
     var topicQuery = topicsCollection.reactiveQuery({_id: _topicId});
-    var config = getConfig(runtime_mode);
     var padLink = config.protocol + "://" + config.domain;
 
     if(_topicId && !_.isEmpty(topicQuery.result)){
@@ -286,5 +286,25 @@ window.asteroid = (function(){
   };
 
 
+
+  exports.updateList = function(options){
+    var knotes = asteroid.getCollection('knotes');
+    var updateOption = {};
+    switch(options.case){
+      case "updateTitle":
+        updateOption.title = options.title;
+        break;
+
+      case "updateItems":
+        updateOption.options = options.options
+        break;
+      default:
+    }
+    updateOption.updated_date = Date.now();
+    console.log("updateList - ", updateOption);
+    knotes._localToRemoteUpdate(options.knoteId, updateOption);
+  };
+
+  exports.init(config.server);
   return exports;
 })();

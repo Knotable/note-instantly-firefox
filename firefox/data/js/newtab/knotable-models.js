@@ -43,6 +43,26 @@ window.KnotableModels = function() {
         to: to_emails
       };
     },
+    _getKnoteListData: function() {
+      var to_emails = this.get("to");
+      if (to_emails && to_emails.length) {
+        to_emails = to_emails.map(function(emailAddress) {
+          return emailAddress.replace(/^(.*?)</, '').replace(/>$/, '');
+        });
+      }
+      return {
+        topic_id: this.get("topicId"),
+        fileIds: this.get("fileIds"),
+        date: this.get("date"),
+        order: isFinite(this.get("order")) ? this.get("order") : void 0,
+        from: this.get("from_email"),
+        editors: this.get('editors'),
+        title: this.get('title'),
+        subject: this.get("subject"),
+        options: this.get("options") || [],
+        to: to_emails
+      };
+    },
     UUID: function(len) {
       len = len || 5;
       return (new Array(len).join(' ').split(' ')).map(function() {
@@ -88,6 +108,28 @@ window.KnotableModels = function() {
         });
       });
 
+      return defer.promise();
+    },
+    saveList: function() {
+      var defer = new $.Deferred();
+      var self = this,
+      data = _.extend(this.toJSON(), this._getKnoteListData());
+
+      data.title = $('#knote-list-title').val().trim();
+
+      console.log("body", data);
+
+      knoteClient.addListKnote(data).then(function(knoteId) {
+        self.set("knoteId", knoteId);
+        defer.resolve(knoteId);
+        self.changed = false;
+      }).fail(function(err) {
+        self.trigger('fail', {
+          reason: 'Saving Knote failed',
+          error: err
+        });
+        defer.reject(err);
+      });
       return defer.promise();
     },
     destroy: function() {

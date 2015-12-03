@@ -57,8 +57,6 @@ var updateIcon = function(stat) {
 };
 
 
-window.knoteServer = new KnotableMeteor();
-
 
 var notificationsCallbacks = {};
 chrome.notifications.onClicked.addListener(function(id) {
@@ -71,7 +69,9 @@ chrome.notifications.onClicked.addListener(function(id) {
   }
   notificationsCallbacks[id] = undefined;
 });
+
 var notificationsTimers = {};
+
 window.createNotification = function(request) {
   // The notifications object in Firefox only has one method: notify
   chrome.notifications.create(request.options);

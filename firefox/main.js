@@ -10,13 +10,14 @@ var { data } = require('sdk/self'),
   tabsHelper = require('./lib/tabs_helper'),
   notificationsHelper = require('./lib/notifications_helper');
 
-var backgroundWorker, newtabWorker, panelWorker;
+var backgroundWorker, panelWorker;
+var newtabs = tabsHelper.Newtabs();
 
 initToggleButton();
 
 initBackground();
 
-initTabs();
+newtabs.init(backgroundWorker, handleFnCall);
 
 exports.onUnload = extHelper.onUnload;
 
@@ -81,18 +82,21 @@ function initToggleButton() {
   }
 
   function handleToggleButtonChange(state) {
-    if(state.checked && extHelper.hasLoggedIn()) {
-      panelWorker.show({
-        position: button
-      });
-    } else {
-      handlePanelHide();
-    }
+    panelWorker.show({
+      position: button
+    });
   }
 }
 
-function getWorkerBackgroundTo(msg) {
-  return msg.fromFrame == 'panel' ? panelWorker : newtabWorker;
+function sendBackgroundMsg(type, msg) {
+  msg.sender = {id: config.name};
+  if (msg.fromFrame == 'panel') {
+    if (panelWorker) {
+      panelWorker.port.emit(type, msg);
+    }
+  } else {
+    newtabs.sendMessage(type, msg);
+  }
 }
 
 function handleFnCall(msg) {
@@ -102,6 +106,16 @@ function handleFnCall(msg) {
       break;
     case 'notifications:create':
       notificationsHelper.create(msg.options);
+    case 'logout':
+      extHelper.clearCache();
+      extHelper.reloadPanel(panelWorker);
+    case 'login':
+      extHelper.reloadPanel(panelWorker);
+      newtabs.getAllWorkers(function(workersObject) {
+        for (var index in workersObject) {
+          extHelper.sendTopicId(workersObject[index]);
+        }
+      });
   };
 }
 
@@ -124,72 +138,24 @@ function initBackground() {
   });
 
   backgroundWorker.port.on('msg', function(msg) {
-    console.log('=======> msg from background to ' + (msg.fromFrame || 'all') + ': ', msg);
+    //console.log('=======> msg from background to ' + (msg.fromFrame == 'panel' ? 'panel' : 'newtab') + ': ', msg);
     if (msg && msg.args && msg.args.isFnCall) {
       handleFnCall(msg.args);
       return;
     }
-    var worker = getWorkerBackgroundTo(msg);
-    if (worker) {
-      msg.sender = {id: config.name};
-      worker.port.emit('msg', msg);
-    }
+    sendBackgroundMsg('msg', msg);
   });
 
   backgroundWorker.port.on('response:msg', function(msg) {
-    console.log('=======> response msg from background to ' + (msg.fromPanel ? 'panel' : 'newtab') + ': ', msg);
-    var worker = getWorkerBackgroundTo(msg);
-    if (worker) {
-      msg.sender = {id: config.name};
-      worker.port.emit('response:msg', msg);
-    }
+    //console.log('=======> response msg from background to ' + (msg.fromFrame == 'panel' ? 'panel' : 'newtab') + ': ', msg);
+    sendBackgroundMsg('response:msg', msg);
   });
+
   backgroundWorker.port.on('storage', function(request) {
-    console.log('=======> storage request from background: ' + JSON.stringify(request));
+    //console.log('=======> storage request from background: ' + JSON.stringify(request));
     if (backgroundWorker) {
       storageHelper.handleStorageRequest(request, function(response) {
         backgroundWorker.port.emit('response:storage', response);
-      });
-    }
-  });
-}
-
-function initTabs() {
-  tabs.on("ready", function(tab) {
-    var newtabUrl = data.url('newtab.html');
-    if (tab.url == newtabUrl) {
-      extHelper.clearURLBarIfNewtab();
-      tab.on('activate', function(tab) {
-        extHelper.clearURLBarIfNewtab();
-      });
-      newtabWorker = tab.attach({
-        contentScriptFile: extHelper.getNewTabScripts(),
-        contentScriptOptions: {
-          extName: config.name,
-          basePath: data.url('')
-        }
-      });
-      newtabWorker.port.on('msg', function(msg) {
-        console.log('=======> msg from newtab to background: ', msg)
-        if (msg && msg.args && msg.args.isFnCall) {
-          handleFnCall(msg.args);
-          return;
-        }
-        // transport the msg to background page
-        backgroundWorker.port.emit('msg', msg)
-      });
-      newtabWorker.port.on('response:msg', function(msg) {
-        console.log('=======> response msg from newtab to background: ', msg)
-        // transport the msg to background page
-        backgroundWorker.port.emit('response:msg', msg)
-      });
-      newtabWorker.port.on('storage', function(request) {
-        console.log('=======> storage request from newtab: ' + JSON.stringify(request));
-        if (newtabWorker) {
-          storageHelper.handleStorageRequest(request, function(response) {
-            newtabWorker.port.emit('response:storage', response);
-          });
-        }
       });
     }
   });

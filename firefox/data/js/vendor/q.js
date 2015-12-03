@@ -118,7 +118,9 @@ var nextTick =(function () {
                     if (domain) {
                         domain.exit();
                     }
-                    setTimeout(flush, 0);
+                    setTimeout(function() {
+                        flush();
+                    }, 0);
                     if (domain) {
                         domain.enter();
                     }
@@ -191,14 +193,18 @@ var nextTick =(function () {
             channel.port2.postMessage(0);
         };
         requestTick = function () {
-            setTimeout(flush, 0);
+            setTimeout(function() {
+                flush();
+            }, 0);
             requestPortTick();
         };
 
     } else {
         // old browsers
         requestTick = function () {
-            setTimeout(flush, 0);
+            setTimeout(function() {
+                flush();
+            }, 0);
         };
     }
 
@@ -215,10 +221,17 @@ var nextTick =(function () {
 // the minified code by reducing x.call() to merely x()
 // See Mark Miller’s explanation of what this does.
 // http://wiki.ecmascript.org/doku.php?id=conventions:safe_meta_programming
+/**
 var call = Function.call;
 function uncurryThis(f) {
     return function () {
         return call.apply(f, arguments);
+    };
+}
+**/
+function uncurryThis(f) {
+    return function () {
+        return f.call.apply(f, arguments);
     };
 }
 // This is equivalent, but slower:

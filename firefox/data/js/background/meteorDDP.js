@@ -9,6 +9,10 @@ var KnotableMeteor = function() {
   var exports = {};
   var config = getConfig(runtime_mode);
 
+  exports.getPadLink = function(){
+    return asteroid.getPadLink();
+  };
+
   exports.getTopicId = function(){
     return asteroid.getTopicId();
   };
@@ -29,7 +33,7 @@ var KnotableMeteor = function() {
       body: data.htmlBody,
       htmlBody: data.htmlBody,
       name: AccountHelper.getUsername(),
-      topic_id: data.topic_id,
+      topic_id: asteroid.getTopicId(),
       userId: asteroid.userId,
       date: data.date || new Date().toGMTString(),
       isMailgun: false,
@@ -45,7 +49,9 @@ var KnotableMeteor = function() {
       return;
     }
 
-    exports.apply('updateNewTabTopicPosition', [data.topic_id, 300, 'ext:KnotableMeteor.addKnote']);
+    exports.apply('updateNewTabTopicPosition', [requiredKnoteParams.topic_id, 300, 'ext:KnotableMeteor.addKnote']);
+
+    console.log('======> add_knote: ', requiredKnoteParams, optionalKnoteParams);
     return exports.call("add_knote", requiredKnoteParams, optionalKnoteParams);
   };
 

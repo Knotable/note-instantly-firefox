@@ -1,4 +1,5 @@
 var data = require('sdk/self').data,
+  config = require("../package.json"),
   ss = require('sdk/simple-storage'),
   Service = require("sdk/preferences/service"),
   winUtils = require('sdk/window/utils'),
@@ -10,8 +11,11 @@ function getPanelScripts() {
     'js/vendor/moment-with-locales.js',
     'js/vendor/jquery-ui.js',
     'js/vendor/underscore.js',
+    'js/vendor/backbone.js',
     'js/chrome-adapter/attach-chrome.js',
     'js/newtab/knote-client.js',
+    'js/newtab/knote_helper.js',
+    'js/newtab/knotable-views.js',
     'js/browser-action/browserPopup.js'
   ];
 
@@ -39,6 +43,7 @@ function getNewTabScripts() {
     'js/newtab/google-oAuth.js',
 
     'js/newtab/sync-helper.js',
+    'js/newtab/knote_helper.js',
     'js/newtab/update-helper.js',
 
     'js/newtab/background-image.js',
@@ -86,9 +91,14 @@ function onUnload(reason) {
   if (reason == 'uninstall' || reason == 'disable') {
     NewTabURL.reset();
     //Service.set('browser.newtab.url', 'about:newtab');
-    for (var key in ss.storage) {
-      delete ss.storage[key];
-    }
+    clearCache();
+  }
+}
+
+function clearCache() {
+  console.log('==========> clear cache!');
+  for (var key in ss.storage) {
+    delete ss.storage[key];
   }
 }
 
@@ -106,9 +116,25 @@ exports.hasLoggedIn = function() {
   return !!ss.storage['topicId']
 };
 exports.getURLBar = getURLBar;
+exports.clearCache = clearCache;
 exports.clearURLBarIfNewtab = function() {
   var urlbar = getURLBar()
   if (urlbar.value == data.url('newtab.html')) {
     urlbar.value = '';
   }
+};
+exports.sendTopicId = function(worker) {
+  var topicId = ss.storage['topicId'];
+  if (topicId) {
+    worker.port.emit('msg', {
+      args: {
+        msg: 'topicId',
+        topicId: topicId,
+      },
+      sender: {id: config.name}
+    });
+  }
+};
+exports.reloadPanel = function(worker) {
+  worker.port.emit('reload');
 };

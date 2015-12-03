@@ -1,21 +1,47 @@
 'use strict';
 
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-46641860-9']);
-_gaq.push(['_trackPageview']);
+function postAnalyticsData(extraData) {
+  knoteClient.getUserInfo().then(function(contact) {
+    if(_.isEmpty(contact)) {
+      return;
+    }
 
-(function() {
-  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = 'https://ssl.google-analytics.com/ga.js';
-  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
+    if (contact._id) {
+      var data = {
+        v: 1,
+        tid: 'UA-46641860-9',
+        cid: contact._id
+      };
+      data = _.extend(data, extraData);
 
+      $.post('http://www.google-analytics.com/collect', data, function(res, status) {
+        console.log('>>>>>>>>>>>>> post analytics data <<<<<<<<<<<<<<');
+        console.log(data);
+        console.log('status: ' + status);
+        console.log('response: ' + res);
+        console.log('>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<');
+      });
+    }
+  });
+}
+
+function postEventData(name, action) {
+  postAnalyticsData({
+    t: 'event',
+    ec: name,
+    ea: action
+  });
+}
 
 (function(window, $) {
+  postAnalyticsData({
+    t: 'pageview',
+    dp: '/newtab'
+  });
 
   window.googleAnalyticsHelper = {
     trackAnalyticsEvent: function(evtTitle, evtDetail){
-      _gaq.push(['_trackEvent', evtTitle, evtDetail]);
+      postEventData(evtTitle, evtDetail);
     }
   };
 

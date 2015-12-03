@@ -11,14 +11,48 @@ window.Subscriptions = (function(){
   exports.subscribeTopic = function(topicId) {
     var knotes = asteroid.getCollection('knotes');
     var knotesQuery = knotes.reactiveQuery({topic_id: topicId});
-    console.log("knotesQuery", knotesQuery.result);
+    //console.log("knotesQuery", knotesQuery.result);
 
     if (topicId && topicId !== _topicId){
       _topicId = topicId;
       console.log("subscribe", topicId);
+      asteroid.subscribe('topic', topicId, true)
+        .ready
+        .then(function() {
+          chrome.runtime.sendMessage({
+            msg: 'topicId',
+            topicId: topicId
+          });
+        });
+      var containers = [
+        {name: 'main'},
+        {name: 'attachment'}
+      ];
+      asteroid.subscribe('topicKnotes', topicId, containers);
 
-      asteroid.subscribe('topic', topicId);
+      var topicCollection = asteroid.getCollection("topics");
+      var topicQuery = topicCollection.reactiveQuery({_id: topicId});
+      var currentTopic = topicQuery.result[0];
+
+      var renameTopic = _.throttle(function(topicCollection, currentTopic){
+        var subject = 'Knotes';
+        if (subject !== currentTopic.subject){
+          console.log("rename topic", currentTopic.subject, subject);
+          topicCollection.update(topicId, {subject: subject});
+        }
+      }, 5000);
+      if(currentTopic){
+        renameTopic(topicCollection, currentTopic);
+      } else {
+        console.log("currentTopic", currentTopic);
+        topicQuery.on('change', function(t){
+          renameTopic(topicCollection, topicQuery.result[0]);
+        });
+      }
+
       asteroid.subscribe('allRestKnotesByTopicId', topicId);
+      asteroid.subscribe('pinnedKnotesForTopic', topicId);
+
       _watchKnotes(knotesQuery);
     }
 
@@ -28,7 +62,9 @@ window.Subscriptions = (function(){
   var _sendCachedKnotes = function(knotesQuery){
     // send knotes from cache
     _.each(knotesQuery.result, function(knote){
-      _addedKnote(knote);
+      if(!knote.archived){
+        _addedKnote(knote);
+      }
     });
   };
 
@@ -45,17 +81,16 @@ window.Subscriptions = (function(){
       if (knoteId.match('__upd__') && knote){
         _knoteId = knote._id;
         _updateKnote(knote);
-      } else if (knoteId.match('__del__')){
-        knoteId = knoteId.match(/(.*)__del__/)[1];
-        _removedKnoteId = knoteId;
-        _removedKnote(knoteId);
-      } else if(knote){
+      } else if (knote) {
         if(!_.contains([_removedKnoteId, _knoteId], knote._id)){
           _addedKnote(knote);
         } else {
           _removedKnoteId = null;
           _knoteId = null;
         }
+      } else {
+        _removedKnoteId = knoteId;
+        _removedKnote(knoteId);
       }
     });
   };

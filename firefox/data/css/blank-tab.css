@@ -6,7 +6,6 @@
     url('../fonts/roboto-regular-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-
 }
 
 @font-face {
@@ -17,7 +16,6 @@
     url('../fonts/roboto-light-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-
 }
 
 @font-face {
@@ -28,7 +26,6 @@
     url('../fonts/roboto-medium-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-
 }
 
 @font-face {
@@ -39,24 +36,26 @@
     url('../fonts/roboto-thin-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-
 }
 
 html {
     width: 100%;
     height: 100%;
 }
-input, textarea, a {
+
+input,
+textarea,
+a {
     outline: none;
 }
+
 a {
     cursor: pointer;
 }
 
-
 .background-img {
-    width:auto;
-    height:100%;
+    width: auto;
+    height: 100%;
     display: block;
     z-index: 0;
     position: fixed;
@@ -71,40 +70,38 @@ a {
     position:fixed;
     left:0px;
     top:0px;
-
     background-color:white;
-
     width:100%;
     height:100%;
-
     opacity: 1;
-
     transition: opacity 0.7s ease-in-out;   
 }
 
 .page-container {
     opacity: 1.0;
-
     transition: opacity 1.5s ease-in-out;   
 }
-
 
 .invisible {
     visibility: hidden;
 }
+
 .note-area {
     width: 462px;
     margin: 0 auto;
     display: block;
 }
+
 .knotable-input-container {
     margin: 0 20px;
     position: relative;
 }
+
 .knotable-input-inner {
     height: 65px;
     padding: 18px !important;
 }
+
 .knotable-input {
     background: none;
     border: none;
@@ -116,15 +113,9 @@ a {
     line-height: 20px;
     width: 104%;
     min-height: 100%;
-    //padding: 18px;
     overflow: hidden;
     max-height: 100%;
-    //position: absolute;
-    //top: 18px;
-    //left: 17px;
-    //margin-top: 1em;
     padding-right:4%;
-
 }
 
 #clearKnote {
@@ -135,25 +126,23 @@ a {
     cursor: default;
     font-weight: bold;
     color: rgba(0, 0, 0, 1);
-
-    opacity:0.5;
+    opacity: 0.5;
     width: 13px;
     height: 13px;
     color: black;
     border-radius: 50%;
-    line-height:1em;
+    line-height: 1em;
     font-size: 13px;
-    font-weight:900;
-
+    font-weight: 900;
     -webkit-transition: background-color 1s, color 1s, transform 1s; /* For Safari 3.1 to 6.0 */
     transition: background-color 1s, color 1s, transform 1s;
 }
 
 #clearKnote:hover {
-    transform:rotate(180deg);
-    opacity:1;
-    color:white;
-    background-color:rgba( 0, 0, 0, 0.6 );
+    transform: rotate(180deg);
+    opacity: 1;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 .textarea {
@@ -162,13 +151,11 @@ a {
     background-color: rgba(242,242,242, 0.6);
     width: 600px;
     min-height: 30.25em;
-    //padding: 18px;
     padding-left:25px;
     padding-right:10px;
     padding-top:25px;
     padding-bottom:25px;
     display: none;
-    //border-radius: 5px;
 }
 
 .knotable-input:before{
@@ -186,16 +173,13 @@ a {
     height: 32px;
     font-size: 15px;
     text-indent: 15px;
-
     background-color:#28ade8;
-
 }
 
 .title-bar .email-close {
     display:inline-block;
     font-size:12px;
     color:white;
-
     cursor:pointer;
     text-indent: 0px;
     position: absolute;
@@ -204,37 +188,30 @@ a {
 }
 
 .title-bar .email-close:hover {
-    color:grey;
+    color: grey;
 }
 
 .knotable-box-large .gmail-box-wrapper {
-    padding:0px;
+    padding: 0px;
 }
-
 
 #email-knote-form input {
     border-bottom-width:1px;
     border-top-width:0px;
     border-left-width:0px;
     border-right-width:0px;
-
     text-indent:2em;
-
     width:100%;
     line-height:3em;
-
 }
 
-
-
 #email-knote-form .mail-content {
-    min-height:12em;
+    min-height: 12em;
 }
 
 .gmail-box-wrapper .footer-box {
     width:100%;
     height:70px;
-
     border-top:1px solid rgb(238, 238, 238);
 }
 
@@ -253,16 +230,15 @@ a {
     border-radius:4px;
     width:20%;
     line-height: 2.2em;
-
     position:absolute;
     right:40px;
     bottom:15px;
     font-size:15px;
     font-weight:900;
 }
+
 .knotable-input::-webkit-scrollbar {
     width: 5px;
-   /* background: #fff;*/
     border-radius: 10px;
 }
 
@@ -270,53 +246,63 @@ a {
     width:100%;
 }
 
-/*.knotable-input::-webkit-scrollbar-track-piece  {
-    background-color: rgba(255,255,255, 0.5);
-    border-radius: 10px;
-}*/
-
 .knotable-input::-webkit-scrollbar-thumb {
     background-color: rgba(255,255,255, 0.3);
     border-radius: 10px;
     margin: 10px;
-
 }
-.knotable-input::-webkit-scrollbar-thumb:hover{
+
+.knotable-input::-webkit-scrollbar-thumb:hover {
     background-color: rgba(255,255,255, 0.5);
 }
 
-
-.knotable-input-active{
- /*   background: rgba(128, 128, 128, 0.5);*/
+.knotable-input-active {
     border-radius: 5px;
 }
-.knotable-input, .button-icon {
+
+.knotable-input,
+.button-icon {
     opacity: 0.9;
 }
-.knotable-input:hover, .knotable-input:focus, .button-icon:hover, .button-icon:focus {
+
+.knotable-input:hover,
+.knotable-input:focus,
+.button-icon:hover,
+.button-icon:focus {
     opacity: 1;
 }
+
 .send-area input[type="text"]::-webkit-input-placeholder {
     color: #fff;
     -webkit-transition: opacity 0.3s linear;
 }
+
 .send-area input[type="text"]:focus::-webkit-input-placeholder  {
     opacity: 0;
 }
 
 .placeholder {
-    position: absolute;left: 0;right:0;top: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
     text-align: center;
-    color: #fff;font-family: 'robotoregular', Arial, sans-serif;font-size: 20px;line-height:1.3;
+    color: #fff;
+    font-family: 'robotoregular', Arial, sans-serif;
+    font-size: 20px;
+    line-height: 1.3;
 }
+
 .note-area  {
     margin-top: 28px;
     margin-bottom: 28px;
     text-align: center;
 }
+
 .clear {
     clear: both;
 }
+
 .tip {
     float: left;
     margin: 0 5px 0 0;
@@ -349,98 +335,113 @@ a {
 .tiny-content {
     padding: 0 10px;
 }
+
 .saved-icon {
     display: none;
     margin: 0 0 10px;
 }
-html, body {
+
+html,
+body {
     font-family: 'robotolight', Arial, sans-serif;
     font-size: 13px;
-    margin: 0;padding:0;
+    margin: 0;
+    padding: 0;
     min-height: 100%;
-    //background-color: #28ADE8;
 }
 
 .note-action .icon {
     cursor: pointer;
 }
-.jspContainer {
-    /*outline: none;*/
-    /*height: 406 ! important;*/
-}
+
 .jspVerticalBar {
     width: 5px;
 }
+
 .jspTrack {
     background: none;
 }
+
 .jspDrag {
     background: #fff;
     opacity: 0.3;
-    border-radius: 3px;-moz-border-radius: 3px;-webkit-border-radius: 3px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
 }
+
 .jspDrag:hover {
     opacity: 0.5;
 }
+
 .jspDrag:focus {
     opacity: 0.8;
 }
-.note-container {
-    /*position: absolute;left:0;top:0;
-    width:380px;height: 100%;overflow-y: auto;*/
-}
 
 .note-container-right {
-    position: absolute;right:0;top:0;
-    width:380px;height: 100%;overflow-y: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 380px;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .note:first-child {
     margin-top: 40px;
 }
-.note, .note textarea {
+
+.note,
+.note textarea {
     cursor: pointer;
 }
+
 .note{
     display: inline-block;
     padding: 15px 23px;
     margin: 20px 40px;
     width: 300px;
     max-width: 300px;
-    /*position: relative;*/
     border: 1px solid rgba(255,255,255,0.2);
     color: #fff;
     border-radius: 5px;
 }
-.note:hover, .note.active{
+
+.note:hover,
+.note.active {
     background: rgba(128, 128, 128, 0.5);
 }
 
 .note textarea {
-    width:100%;
+    width: 100%;
     min-height: 18px;
     transition: all 0.2s;
     font-family: 'robotoregular', Arial, sans-serif;
     font-size: 14px;
-    color:#000;
+    color: #000;
     line-height: 18px;
     resize: none;
-    outline:none;
-    border:none;
+    outline: none;
+    border: none;
     background: none;
     margin: 0;
     padding: 0;
     min-height: 5em;
 }
+
 .note > div {
     position: relative;
 }
+
 .note .note-spinner {
-    position: absolute;right: 0;top: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
     color: #fff;
 }
 
-.note .error, .note .saved-icon {
+.note .error,
+.note .saved-icon {
     bottom: 32px;
     left: 0;
 }
@@ -471,17 +472,22 @@ html, body {
     color: #fff;
     font-size: 15px;
 }
+
 .note-action a + a {
     margin-left: 3px;
 }
 
-*, *:after, *:before {
+*,
+*:after,
+*:before {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 
-*, *:after, *:before {
+*,
+*:after,
+*:before {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -490,29 +496,28 @@ html, body {
 .clock {
     padding: 20px 20px 0;
     text-align: center;
-    color:#fff;
+    color: #fff;
     position: relative;
     top: 0;
     margin-top: 10%;
     -webkit-transition: margin-top .8s ease-out;
-    font-size:180px;font-family: 'robotothin',Arial,sans-serif;
+    font-size: 180px;
+    font-family: 'robotothin', Arial, sans-serif;
 }
+
 .clock-hour {
     font-weight: 100;
     line-height: 1.05;
     margin-top: 0;
 }
+
 .clock-date {
-    font-size:28px;
+    font-size: 28px;
     line-height: 1.35;
-/*
-    opacity: 0.7;
-*/
     padding-bottom: 59px;
 }
+
 .knotable-body {
-    /*overflow: hidden;*/
-    /*margin-bottom: 100%;*/
     background-repeat: no-repeat;
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -530,11 +535,14 @@ html, body {
     bottom:0;
     overflow:auto;
 }
-.knotable-wrapper, .knotable-wrapper * {
+
+.knotable-wrapper,
+.knotable-wrapper * {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
 }
+
 .button-icon {
     background-position: center center;
     background-repeat: no-repeat;
@@ -542,26 +550,32 @@ html, body {
     display: inline-block;
     vertical-align: middle;
 }
+
 .button-icon + .button-icon {
     margin-left: 59px;
 }
+
 .show-send-note {
     background-image: url(../images/mail.png);
     width: 30px;
     height: 24px;
 }
+
 .show-send-note.small{
     width:  16px;
     height: 16px;
 }
+
 textarea::-webkit-input-placeholder {
     text-align: center;
     color: #fff;
     -webkit-transition: opacity 0.3s linear;
 }
-textarea:focus::-webkit-input-placeholder  {
+
+textarea:focus::-webkit-input-placeholder {
     opacity: 0;
 }
+
 .save-note {
     cursor: pointer;
     position: absolute;
@@ -571,6 +585,7 @@ textarea:focus::-webkit-input-placeholder  {
     font-weight: 800 !important;
     font-size: 1.4em;
 }
+
 .send-note-to-k {
     background-image: url(../images/knote.png);
     width: 22px;
@@ -578,72 +593,87 @@ textarea:focus::-webkit-input-placeholder  {
 }
 
 .send-area label {
-    font-size: 14px;font-family: 'robotoregular', Arial, sans-serif;color: #fff;line-height:1.36;
+    font-size: 14px;
+    font-family: 'robotoregular', Arial, sans-serif;
+    color: #fff;
+    line-height: 1.36;
     opacity: 0.6;
     display: inline-block;
     margin: 21px 6px 21px 15px;
 }
+
 .send-area {
     margin: 8px 0 0;
-   /*background: url('../images/normal.png') no-repeat center center;*/
     height: 56px;
     text-align: left;
 }
 
-.send-area .top{
+.send-area .top {
     height: 18px;
     background: url("../images/top.png") no-repeat;
 }
-.send-area .middle{
+
+.send-area .middle {
     background: url("../images/middle.png") repeat-y;
 }
 
-.send-area .middle label{
+.send-area .middle label {
     margin: 0px 6px 0 15px;
 }
-.send-area .bottom{
+
+.send-area .bottom {
     height: 10px;
     background: url("../images/border.png") no-repeat;
 }
 
-.send-area .left{
+.send-area .left {
     width: 388px;
     display:inline-block;
 }
-.send-area .left div{
+
+.send-area .left div {
     margin: 4px 0 4px 0;
 }
-.send-area .right{
+
+.send-area .right {
     display: inline-block;
     float: right;
 }
 
-.send-area input[type="text"], .send-area a {
-    font-size: 16px;color: #fff;line-height:1.32;
+.send-area input[type="text"],
+.send-area a {
+    font-size: 16px;
+    color: #fff;
+    line-height: 1.32;
     background: none;
     border: none;
 }
+
 .send-area input[type="text"] {
     font-family: 'robotoregular', Arial, sans-serif;
     position: relative;
     top: 1px;
     width: 260px;
 }
+
 .send-area a {
     font-family: 'robotomedium', Arial, sans-serif;
     width: 70px;
     display: inline-block;
     text-align: center;
 }
+
 .back {
     position: fixed;
     top: 5px;
     left: 5px;
     color: #fff;
 }
+
 .of-editing-knote {
     display: none;
 }
+
 .error {
     display: none;
     float: left;
@@ -657,12 +687,11 @@ textarea:focus::-webkit-input-placeholder  {
     -webkit-box-shadow: inset 0px 0px 3px #78000D;
 }
 
-
 .top-icons {
     position: absolute;
     right: 80px;
     top: 60px;
-    height:200px;
+    height: 200px;
 }
 
 .new-tab-logo {
@@ -672,38 +701,26 @@ textarea:focus::-webkit-input-placeholder  {
 }
 
 .lnkLikeWallpaper{
-    /*display: none;*/
     position: absolute;
     top: 93%;
     left: 83%;
     z-index: 100;
-    /*float: right;*/
     color: white;
     text-decoration: none;
 }
 
 @media only screen and (max-width: 1024px) {
-    .note-container,.note-container-right {
-        /*position: static;*/
-    }
-
-    .note-container, .note-container-right, .jspContainer, .jspPane {
-        /*width: 100% !important;*/
-    }
-
-    .note {
-        /*float: left;*/
-    }
-
     .knotable-body  {
         right: 50%;
         margin-right: -40px;
     }
+
 }
 
 .hidden{
     display: none;
 }
+
 .note-container{
     width: 100%;
     margin-top: 480px;
@@ -712,15 +729,15 @@ textarea:focus::-webkit-input-placeholder  {
     top: 45%;
     margin-top: 40%;
 }
+
 .note-container .note{
     float: left;
     width: 24.5% !important;
     display: block !important;
     margin: 1em 0.5em;
     color: black;
-    background: rgba(200,200,200,0.85);
+    background: rgba(200, 200, 200, 0.85);
     min-height: 5em;
-
 }
 
 a#avatar-wrapper{
@@ -730,116 +747,127 @@ a#avatar-wrapper{
 
 #msgNewKnotes{
     position: absolute;
-    /*color: white;*/
     left: 37%;
     top: 90%;
     text-align: center;
     padding-top: 9px;
 }
 
-.bubble 
-{
-position: relative;
-width: 345px;
-height: 45px;
-padding: 0px;
-background: #FFFFFF;
--webkit-border-radius: 10px;
--moz-border-radius: 10px;
-border-radius: 10px;
+.bubble {
+    position: relative;
+    width: 345px;
+    height: 45px;
+    padding: 0px;
+    background: #FFFFFF;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
 }
 
-.bubble:after 
-{
-content: '';
-position: absolute;
-border-style: solid;
-border-width: 10px 11px 0;
-border-color: #FFFFFF transparent;
-display: block;
-width: 0;
-z-index: 1;
-bottom: -10px;
-left: 161px;
+.bubble:after {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 10px 11px 0;
+    border-color: #FFFFFF transparent;
+    display: block;
+    width: 0;
+    z-index: 1;
+    bottom: -10px;
+    left: 161px;
 }
 
-.msgText{
+.msgText {
     font-size: 18px;
     font-weight: bold;
 }
 
-.nav.navbar-nav li a:hover{
+.nav.navbar-nav li a:hover {
     background: transparent;
 }
-#knote-edit-area:empty{
+
+#knote-edit-area:empty {
     content: "Enter a note";
 }
-#knote-edit-area{
+
+#knote-edit-area {
     width: 100%;
     height: 100%;
     outline: none;
     border: none;
     resize: none;
     padding: 2em 1em;
+    white-space: pre-line;
+    word-wrap: break-word;
 }
+
+#knote-edit-area * {
+    font-size: 13px !important;
+    font-family: 'robotolight', Arial, sans-serif !important;
+}
+
+#knote-sync-message {
+  float: right;
+  top: -18px;
+  margin:0 15px;
+  cursor: pointer;
+  color: white;
+}
+
 #knotes-container{
     color: #777;
-    padding-left: 1em;
-    padding-bottom: 0.5em;
     background: #fff;
-    width: 90%;
     height: 90%;
     min-height: 500px;
     border-radius: 4px;
     float: right;
-    margin-right: 1em;
     min-width: 543px;
     width: 543px;
     max-width: 543px;
+    padding: .8em .4em .8em .8em
 }
-#knotes-container .panel .panel-body textarea:after{
-    content: "@";
-    background: orange;
-    width: 32px;
-    height: 32px;
-    display: block;
-    z-index: 5;
+
+#knotes-container .panel {
+    box-shadow: none
 }
-#knotes-container .panel .panel-body textarea{
-    height: 100%;
-    min-height: 450px;
-    /*background: orange;*/
+
+#knotes-container .panel .panel-body {
+    height: 440px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-bottom: 10px
 }
-#knotes-container .panel .panel-body{
-    height: 80%;
-    /*min-height: 450px;*/
-}
+
 #knotes-container .panel .panel-footer{
     position: absolute;
     bottom: 0;
 }
-#knotes-container .list-group-item:hover{
+
+#knotes-container .list-group-item:hover {
     background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15));
-    background-image:         linear-gradient(top, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15));
+    background-image: linear-gradient(top, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15));
 }
+
 #knotes-container .list-group-item{
     border-radius: 0;
     cursor: pointer;
 }
+
 #knotes-container div{
     padding: 0;
     margin: 0;
 }
+
 #knotes-container #knote-edit-area::-webkit-input-placeholder {
     color:  #aaa;
     text-align: left;
 }
+
 #knotes-container .knote-editor{
-    padding-right: 1em;
-    width: 58.32%
-    max-width: 58.32%
+    padding-right: 1.6em;
 }
-#knotes-container .knote-editor:before{
+
+#knotes-container .knote-editor:before {
     content: "";
     padding: 0;
     margin: 0;
@@ -852,60 +880,113 @@ left: 161px;
     right: 4px;
     top: 0;
     z-index: 1;
-    margin-top: 6px;
 }
-#knotes-container .knote-list-container #knotes-list{
+
+#knotes-list {
     padding: 0;
-    max-height: 450px;
+    max-height: 485px;
+    margin-bottom: 0px
 }
-#knotes-container .knote-list-container{
-    padding-top: 0.39em;
+
+#knotes-container .knote-list-container {
     height: 50%;
     max-height: 50%;
-    overflow-y: scroll;
-    width: 41.65;
-    max-width: 41.65;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 41.65%;
+    max-width: 41.65%;
 }
-#knotes-container #knotes-list a:first-child, #knotes-container #knotes-list a:last-child{
+
+#knotes-container #knotes-list a:first-child,
+#knotes-container #knotes-list a:last-child {
     border: none;
 }
-#knotes-container #knotes-list .list-group-item:first-child{
+
+#knotes-container #knotes-list .list-group-item:first-child {
     border-top: none;
 }
-#knotes-container #knotes-list .list-group-item{
+
+#knotes-container #knotes-list .list-group-item {
     border: none;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
 }
 
+.knote-actions .btn:last-child {
+    margin-right: 0px
+}
+
+.knote-actions .btn {
+    margin-right: .4em;
+    position: relative;
+    display: inline-block;
+    outline: none;
+}
+
+.add-drop-down {
+    position: absolute;
+    left: 0px;
+    bottom: 100%;
+    border: solid 1px #ddd;
+    padding: 0;
+    border-radius: 2px;
+    background: #fdfdfd;
+    display: none;
+}
+
+.add-drop-down li {
+    display: block;
+    line-height: 24px;
+    padding: 0px 22px 0px 34px;
+    text-align: left;
+    color: #777;
+    position: relative;
+}
+
+.add-drop-down li:last-child {
+    padding-bottom: 2px;
+}
+
+.add-drop-down li i {
+    position: absolute;
+    left: 8px;
+    top: 6px;
+}
+
+.add-drop-down li:hover {
+    color: #444;
+    background:#eee;
+}
+
 .btn.btn-clear {
     background: #f7f7f7;
-    border: 1px solid #ddd
+    border: 1px solid #ddd;
 }
 
 .user-avatar-container{
     color: #fff;
 }
-.user-avatar-container div{
-    /*margin-right: 0;*/
+
+.user-avatar-container div {
     padding-left: 0;
 }
-.user-avatar-container {
-    /*padding: 2em 1em;*/
-    /*padding-left: 1em;*/
-}
+
 .user-avatar-container div {
     text-align: right;
 }
-.user-avatar-container #user-avatar-username{
+
+.user-avatar-container #user-avatar-username {
     font-weight: 800;
 }
 
-#userAvatar img{
-    width: 50px; height: 50px; border-radius: 50%;
+#userAvatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    vertical-align: inherit;
 }
 
-strong{
+strong {
     font-family: "robotomedium";
     font-weight: 500;
 }
@@ -913,31 +994,34 @@ strong{
 .searchbox{
     position: relative;
 }
-.searchbox input{   
+
+.searchbox input {
     padding-left: 24px;
     height: 32px;
     line-height: 32px;
     width: 95%;
     border-radius: 3px;
     border: 1px solid #ccc;
-
 }
-.searchbox i.glyphicon-search{
+
+.searchbox i.glyphicon-search {
     position: absolute;
     left: 8px;
     line-height: 32px;
 }
-.searchbox i.glyphicon-remove-sign{
+
+.searchbox i.glyphicon-remove-sign {
     display: none;
     position: absolute;
     right: 16px;
     line-height: 32px;
 }
-.navbar-clear{
+
+.navbar-clear {
     padding: 2em;
 }
 
-#newtab-header{
+#newtab-header {
     margin: 1em;
     margin-right: 0;
 }
@@ -949,7 +1033,6 @@ strong{
 #google-apps i{
     font-size: 48px;
     color: #fff;
-    /*margin-top: 34px;*/
 }
 
 #newtab-topic-id img{
@@ -957,25 +1040,215 @@ strong{
     margin-right: 1.5em;
 }
 
-a, a:hover{
+a,
+a:hover {
     text-decoration: none;
     color: #fff;
 }
+
 #footer #like-wallpaper{
     color: #fff;
     position: absolute;
     bottom: 1em;
     right: 1em;
 }
+
 .knotable-lightbox-inner{
     opacity: 0.6;
     background: #000;
 }
-#email-knote-form input:invalid:focus {
-    /*background: #fee;*/
-}
 
 #background-grad {
-background-color: #5DBEE7;
+    background-color: #5DBEE7;
 }
 
+#knote-list-title,
+#knote-add-list-textarea {
+    cursor: text;
+    border: none;
+    padding-bottom: 5px;
+    margin: 0;
+    width: 240px;
+    overflow-x: hidden;
+    height: 20px;
+    min-height: 20px;
+    outline: none;
+    border: none;
+    resize: none
+}
+
+#knote-list-title {
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+#knote-list-title::-webkit-input-placeholder,
+#knote-add-list-textarea::-webkit-input-placeholder {
+    color: #aaa;
+    text-align: left
+}
+
+#knote-list-container {
+    outline: none;
+    border: none;
+    resize: none;
+    width: 100%;
+    min-height: 440px
+}
+
+#add-list-item,
+.remove-list-item {
+    color: #aaa;
+    cursor: pointer;
+    visibility: hidden;
+    vertical-align: middle;
+}
+
+.textarea_error {
+    border: 1px solid #a82424 !important
+}
+
+.knote-added-list {
+    margin-bottom: 6px !important;
+    position: relative;
+}
+
+.knote-added-list:hover .remove-list-item {
+    visibility: visible;
+}
+
+#knote-add-list-textarea {
+    line-height: 16px;
+    min-height: 32px;
+}
+
+#knote-add-list-textarea:not(:invalid) + #add-list-item {
+    visibility: visible;
+}
+
+.list-checkbox {
+    position: relative;
+    z-index: 9999;
+    opacity: 0;
+    cursor: pointer;
+    vertical-align: top
+}
+
+.knote-list-label {
+    margin-left: 10px;
+    max-width: 235px;
+    font-weight: 100;
+    white-space: pre-line;
+    word-break: break-word;
+}
+
+.list-checkbox + .knote-list-label:before {
+    content: '';
+    font-family: 'Glyphicons Halflings';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    color: #FFF;
+    border-radius: 2px;
+    border: solid 2px #CCC;
+    left: 2px;
+    margin-top: 3px;
+    transition: background .2s;
+}
+
+.list-checkbox:checked + .knote-list-label:before {
+    content: "\e013";
+    line-height: 10px;
+    font-size: 8px;
+    background: #0AC;
+    border-color: #0AC;
+    text-align: center;
+}
+
+.credits {
+    color: white;
+    position: absolute;
+    bottom: 0;
+    left: 2%;
+}
+
+@media (max-width: 550px) {
+  .knotable-content .container-fluid .row {
+    margin-top: 80px!important;
+  }
+
+  #knotes-container {
+    width: 350px;
+    min-width: 350px;
+    padding: .8em;
+    margin: auto;
+    float: none;
+  }
+
+  #knotes-container .knote-editor {
+    width: 100%;
+    padding: 0;
+  }
+
+  #knotes-container .knote-editor:before {
+    display: none;
+  }
+
+  #knotes-container .knote-list-container {
+    display: none;
+  }
+
+  #knote-sync-message {
+    position: relative;
+    float: none;
+    top: 0;
+    left: calc(50% + 120px);
+    margin:0;
+  }
+}
+
+@media (min-width: 1680px) {
+  .knotable-content {
+    height: calc(100% - 1em);
+    min-height: 505px;
+  }
+
+  .knotable-content .container-fluid,
+  .knotable-content .container-fluid .row > div {
+    height: 100%;
+  }
+
+  .knotable-content .container-fluid .row {
+    height: calc(100% - 250px);
+  }
+
+  .clock {
+    top: calc(50% - 130px);
+    transform: translateY(-50%);
+  }
+
+  #knotes-container {
+    position: relative;
+    float: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  #knotes-container .knote-editor {
+    height: 100%;
+  }
+
+  #knotes-container .panel {
+    height: calc(100% - 44px);
+  }
+
+  #knotes-container .panel .panel-body {
+    height: 100%;
+  }
+
+  #knotes-container .knote-list-container {
+    height: 100%;
+    max-height: none;
+  }
+}

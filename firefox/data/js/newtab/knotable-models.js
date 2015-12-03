@@ -21,6 +21,8 @@ window.KnotableModels = function() {
     },
     _getKnoteData: function() {
       var to_emails = this.get("to");
+      var options = KnoteHelper.getUpdateOptions($('#knote-edit-area'));
+      
       if (to_emails && to_emails.length) {
         to_emails = to_emails.map(function(emailAddress) {
           return emailAddress.replace(/^(.*?)</, '').replace(/>$/, '');
@@ -33,9 +35,11 @@ window.KnotableModels = function() {
         order: isFinite(this.get("order")) ? this.get("order") : void 0,
         from: this.get("from_email"),
         editors: this.get('editors'),
-        title: this.get('title'),
+        title: options.title,
         message_subject: this.get("subject"),
         body: this.get("content_html") || this.get('body'),
+        htmlBody: options.htmlBody,
+        content: options.htmlBody,
         to: to_emails
       };
     },
@@ -46,62 +50,47 @@ window.KnotableModels = function() {
       }).join("-");
     },
     _thumbnailTemplate: '<p><div' +
-    'class="thumbnail-wrapper thumbnail3 uploading-thumb" id="thumb-box-<%- index %>">' +
-    '<p id="thumb-box-status-<%- index %>"></p><div class="thumb img-wrapper">' +
-    '<span class="delete_file_ico">&nbsp;</span>' +
-    '<a href="<%- fileUrl %>" target="_blank">' +
-    '<span class="img-wrapper">' +
-    '<span class="btn-close">' +
-    '</span><img class="thumb" src="<%- thumbURL || fileUrl %>" file_id="<%- fileId %>"' +
-    ' width="176" style="max-width: 400px;"></span>' +
-    '</a>' +
-    '</div>' +
-    '</div>&nbsp;</p>',
+      'class="thumbnail-wrapper thumbnail3 uploading-thumb" id="thumb-box-<%- index %>">' +
+      '<p id="thumb-box-status-<%- index %>"></p><div class="thumb img-wrapper">' +
+      '<span class="delete_file_ico">&nbsp;</span>' +
+      '<a href="<%- fileUrl %>" target="_blank">' +
+      '<span class="img-wrapper">' +
+      '<span class="btn-close">' +
+      '</span><img class="thumb" src="<%- thumbURL || fileUrl %>" file_id="<%- fileId %>"' +
+      ' width="176" style="max-width: 400px;"></span>' +
+      '</a>' +
+      '</div>' +
+      '</div>&nbsp;</p>',
     save: function() {
       var defer = new $.Deferred();
       var self = this,
       data = _.extend(this.toJSON(), this._getKnoteData());
 
-      var content = $('#knote-edit-area').val().trim();
+      knoteClient.getTopicId().then(function(topicId) {
+        console.log("body", data);
+        data.topicId = topicId;
+        data.topic_id = topicId;
 
-      var contentArray = _.compact(content.split('\n'));
-      var body, title;
-      if (contentArray.length > 1){
-        title = contentArray[0];
-        body = content.slice(title.length).trim();
-      } else {
-        title = content;
-        body = ''
-      }
-      data.title = title;
-      data.htmlBody = body;
+        if (!data.topicId) {
+          return;
+        }
 
-      console.log("body", data);
-
-      knoteClient.addKnote(data).then(function(knoteId) {
-        self.set("knoteId", knoteId);
-        defer.resolve(knoteId);
-        self.changed = false;
-      }).fail(function(err) {
-        self.trigger('fail', {
-          reason: 'Saving Knote failed',
-          error: err
+        knoteClient.addKnote(data).then(function(knoteId) {
+          self.set("knoteId", knoteId);
+          defer.resolve(knoteId);
+          self.changed = false;
+        }).fail(function(err) {
+          self.trigger('fail', {
+            reason: 'Saving Knote failed',
+            error: err
+          });
+          defer.reject(err);
         });
-        defer.reject(err);
       });
+
       return defer.promise();
     },
     destroy: function() {
-      var self = this;
-
-      knoteClient.getUserInfo().then(function(userInfo) {
-
-        if (!userInfo.account_id) return;
-
-        knoteClient.apply('updateNewTabTopicPosition', [knoteClient.topicId, 300, 'ext:Knotes.destroy']).then(function(data){
-          console.log('NewTab Pad position updated')
-        });
-      });
     },
     validate: function(attrs) {
       if (!attrs.content) return 'empty content';
@@ -139,14 +128,10 @@ window.KnotableModels = function() {
           $.Deferred().reject(self.validationError);
         }
         if (_.isEmpty(data) || !self.changed) return $.Deferred().reject('no Changes');
-        if (!self.get('topicId') || !self.get('knoteId')) {
+        if (!self.get('knoteId')) {
           return self.save();
         }
         console.debug('update knote metadata', data);
-        console.log('=======> knoteClient.topicId: ', knoteClient.topicId);
-        knoteClient.apply('updateNewTabTopicPosition', [knoteClient.topicId, 300, 'ext:Knotes.update']).then(function(data){
-          console.log('NewTab Pad position updated')
-        });
         return knoteClient.apply('update_knote_metadata', [self.get('knoteId'), data, 'ext:Knotes.update']);
       });
     }

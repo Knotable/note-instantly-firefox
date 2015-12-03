@@ -10,10 +10,10 @@ window.asteroid = (function(){
 
   exports.init = function(host){
     //localStorage.clear()
-    console.log("asteroid.init", arguments);
-
+    console.info("asteroid.init", arguments);
     asteroidDDP = new Asteroid(host);
     window.asteroidDDP = asteroidDDP;
+
 
     var onLogin = function(){
       console.log("user login");
@@ -35,6 +35,10 @@ window.asteroid = (function(){
       chrome.runtime.sendMessage({
         msg: 'login'
       }, $.noop);
+      chrome.runtime.sendMessage({
+        isFnCall: true,
+        type: 'login'
+      }, $.noop);
 
       updateIcon(iconStates.loggedIn);
 
@@ -42,7 +46,7 @@ window.asteroid = (function(){
         .ready
         .then(function() {
           return exports.call('getNewTabTopicId', {
-            subject: AccountHelper.getUsername() + '\'s' + ' Knotes from Firefox',
+            subject: 'Knotes',
             participator_account_ids: [AccountHelper.getAccountId()],
             permissions: ["read", "write", "upload"]
           }).result
@@ -51,6 +55,10 @@ window.asteroid = (function(){
             console.log("subscribe topic", topicId);
             chrome.storage.local.set({'topicId': topicId});
             Subscriptions.subscribeTopic(topicId);
+            chrome.runtime.sendMessage({
+              msg: 'topicId',
+              topicId: topicId
+            });
           });
         });
     };
@@ -68,6 +76,10 @@ window.asteroid = (function(){
       //localStorage.clear();
       chrome.runtime.sendMessage({
         msg: 'logout'
+      }, $.noop);
+      chrome.runtime.sendMessage({
+        isFnCall: true,
+        type: 'logout'
       }, $.noop);
     };
     /**
@@ -104,14 +116,48 @@ window.asteroid = (function(){
     return asteroid.createUser(options);
   };
 
-
-  exports.getTopicId = function(){
-    if (_topicId){
-      Subscriptions.subscribeTopic(_topicId);
-    }
+  exports.getTopicId = function() {
     return _topicId;
   };
 
+  exports.getPadLink = function(){
+    if (_topicId){
+      Subscriptions.subscribeTopic(_topicId);
+    }
+    var topicsCollection = asteroid.getCollection('topics');
+    var topicQuery = topicsCollection.reactiveQuery({_id: _topicId});
+    var config = getConfig(runtime_mode);
+    var padLink = config.protocol + "://" + config.domain;
+
+    if(_topicId && !_.isEmpty(topicQuery.result)){
+      var topic = topicQuery.result[0];
+      if (topic && topic.uniqueNumber){
+        var encodeNumberToShortHash = function(uniqueNumber) {
+          var ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split('');
+          var ALPHABET_LENGTH = ALPHABET.length;
+
+          var urlHash;
+          if (uniqueNumber === 0) {
+            return ALPHABET[uniqueNumber];
+          }
+          urlHash = "";
+          while (uniqueNumber > 0) {
+            urlHash += ALPHABET[uniqueNumber % ALPHABET_LENGTH];
+            uniqueNumber = parseInt(uniqueNumber / ALPHABET_LENGTH, 10);
+          }
+          return urlHash.split("").reverse().join("");
+        };
+
+        padLink += '/p/' + topic._id.slice(0,2) + encodeNumberToShortHash(topic.uniqueNumber);
+      }
+    }
+
+    return padLink;
+  };
+
+  exports.getGoogleOauthToken = function(){
+    return asteroidDDP.call("getGoogleAccessToken", asteroidDDP.userId).result
+  };
 
   exports.loginWithToken = function(token){
     console.info("asteroid.loginWithToken", arguments);
@@ -147,8 +193,8 @@ window.asteroid = (function(){
 
 
   exports.subscribe = function(name, args) {
-    console.log("subscribe", name, args);
-    return asteroidDDP.subscribe(name, args);
+    console.log("subscribe", arguments);
+    return asteroidDDP.subscribe.apply(asteroidDDP, arguments);
   };
 
 
@@ -168,20 +214,42 @@ window.asteroid = (function(){
 
 
   exports.updateKnote = function(knoteId, item){
-    var knotes = asteroidDDP.getCollection("knotes")
+    var knotesCollection = asteroidDDP.getCollection("knotes");
     var htmlBody = item.htmlBody;
     var title = item.title;
     var options = {};
     options.htmlBody = htmlBody;
-    var now = Date.now()
+    var now = Date.now();
 
     if (title){
       options.title = title;
       options.updated_date = now;
-      return knotes.update(knoteId, options)
-      .remote
     } else if (item.order){
-      return knotes.update(knoteId, {order: item.order, updated_date: now}).remote;
+      options = {order: item.order, updated_date: now};
+    }
+
+    if (title || item.order){
+      var knoteQuery = knotesCollection.reactiveQuery({_id: knoteId});
+      console.log("Background Knotes:update", knoteId, knoteQuery.result, options, Boolean(knoteQuery.result));
+      if (_.isEmpty(knoteQuery.result)){
+      	var resultDeferred = Q.defer();
+        var delayChangeFn = _.once(function(){
+          console.log("Asteroid:updateKnote W", knoteId, options);
+          knotesCollection.update(knoteId, options).local.then(function(){
+            resultDeferred.resolve(knoteId);
+          }).fail(function(error){
+            resultDeferred.reject(error);
+          });
+        });
+        knoteQuery.on("change", function(kId){
+          delayChangeFn();
+          knoteQuery.off('change');
+        });
+        return resultDeferred.promise;
+      } else{
+        console.log("Asteroid:updateKnote I", knoteId, options);
+        return knotesCollection.update(knoteId, options).local;
+      }
     } else
     {
       return null;
@@ -190,26 +258,7 @@ window.asteroid = (function(){
 
 
   exports.removeKnote = function(knoteId){
-    // Server don't allow delete knote with content.
-    // So remove content of knote and then remove knote.
-    var deferred = new $.Deferred();
-    var knotes = asteroidDDP.getCollection("knotes");
-    knotes.update(knoteId, {htmlBody: '', file_ids: []})
-    .remote
-    .then(function(){
-      knotes.remove(knoteId)
-      .remote
-      .then(function(){
-        deferred.resolve(knoteId);
-      })
-      .fail(function(){
-        deferred.reject(error);
-      });
-    })
-    .fail(function(error){
-      deferred.reject(error);
-    })
-    return deferred.promise()
+    return asteroidDDP.call("markKnoteAsDone", knoteId).result
   };
 
 
@@ -217,7 +266,7 @@ window.asteroid = (function(){
   exports.showData = function(){
     var knotes = asteroid.getCollection('knotes');
     var knotesQuery = knotes.reactiveQuery({})
-    console.log("knotes", knotesQuery.result);
+    //console.log("knotes", knotesQuery.result);
 
     var userAccount = asteroid.getCollection('user_accounts');
     var userAccountQuery = userAccount.reactiveQuery({})

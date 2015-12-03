@@ -2,9 +2,7 @@ var KnotesSyncView = Backbone.View.extend({
   el: '#sync-knote-container',
   events: {
     'click .sync-close': 'hide',
-    'click [type="checkbox"]': 'settingChanged',
-    'mouseover #setting-gmail-link': 'hoverDraftsLink',
-    'mouseout #setting-gmail-link': 'hoverOutDraftsLink'
+    'click [type="checkbox"]': 'settingChanged'
   },
 
   hoverDraftsLink: function(ele){

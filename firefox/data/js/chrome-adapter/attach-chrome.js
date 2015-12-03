@@ -14,6 +14,7 @@ function messageFactory(type) {
      *  args: any
      *  sender: optional
      *  cbIndex: optional
+     *  tabId: id
      * }
      */
     send: function(args, responseCallback) {
@@ -58,7 +59,8 @@ function messageFactory(type) {
             response = {
               result: response,
               cbIndex: data.cbIndex,
-              fromFrame: data.fromFrame
+              fromFrame: data.fromFrame,
+              tabId: data.tabId
             };
             self.port.emit(typeResponse, response)
           }

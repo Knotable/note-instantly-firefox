@@ -1,5 +1,16 @@
 'use strict';
 
+function setAvatar(avatar, username) {
+  var imgHtml = "<img src='" + avatar + "' />";
+
+  $('#userAvatar').html(imgHtml);
+
+  $('#userAvatar img').error( function() {
+    var text = username[0].toUpperCase();
+    $('#userAvatar').html(text);
+  });
+}
+
 function Knotable() {
   var _events = _.extend({}, Backbone.Events);
   var views = new KnotableViews(_events);
@@ -25,22 +36,13 @@ function Knotable() {
       }
 
       if(avatar !== null && avatar === "false"){
-        $('#userAvatar').addClass('knotable-user-avatar');
         var text = username[0].toUpperCase();
         $('#userAvatar').html(text);
       }
 
 
       if(avatar !== null && avatar !== "false"){
-
-        var imgHtml = "<img style='width: 50px; height: 50px; border-radius: 50%;' src='" + avatar + "' />";
-        $('#userAvatar').html(imgHtml);
-
-        $('#userAvatar img').error( function() {
-          $('#userAvatar').addClass('knotable-user-avatar');
-          var text = username[0].toUpperCase();
-          $('#userAvatar').html(text);
-        });
+        setAvatar(avatar, username);
       }
       if(_.isEmpty(username) ||  _.isEmpty(fullname)){
         _setUserAvatar();
@@ -55,17 +57,8 @@ function Knotable() {
           var gravatar = contact.avatar;
           var username = contact.username;
           if (gravatar && !!gravatar.path) {
-
             chrome.storage.local.set({"avatar": gravatar.path});
-            var imgHtml = "<img style='width: 50px; height: 50px; border-radius: 50%;' src='" + gravatar.path + "' />";
-            $('#userAvatar').html(imgHtml);
-
-            $('#userAvatar img').error( function() {
-              $('#userAvatar').addClass('knotable-user-avatar');
-              var text = username[0].toUpperCase();
-              $('#userAvatar').html(text);
-            });
-
+            setAvatar(gravatar.path, username);
           } else {
             chrome.storage.local.set({"avatar": "false"});
           }
@@ -75,9 +68,6 @@ function Knotable() {
 
           $('#user-avatar-username').text("@" + username);
           $('#user-avatar-displayname').text(contact.fullname)
-
-          /* done updating */
-          //$('#avatar-wrapper').attr('href', link);
         });
       }
     });
@@ -111,7 +101,9 @@ function Knotable() {
 
   $(document).ready(function() {
     console.log('$document is ready');
-    window.setTimeout(setUserInfoLocal, 3000);
+    window.setTimeout(function() {
+      setUserInfoLocal();
+    }, 3000);
   });
 
   return {

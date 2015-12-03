@@ -1,33 +1,18 @@
-var getContentAsText = function(html) {
-  if ($.isArray(html)) {
-    html = html[0];
-  }
-  var text = html;
-  try {
-    var elm = $('<div></div>');
-    elm.append(html);
-    if (elm && elm.length) {
-      text = elm.text();
-    }
-  } catch (e) {
-    console.error(e);
-  }
-  return text.trim();
-
-};
-
 var _addKnoteOnView = function(knotesView, newKnote) {
   var knote = knotesView.collection.find(function(model) {
     return (model.get('knoteId') === newKnote._id);
   });
 
   var knoteBody = '';
-  if(!_.isEmpty(newKnote.title))
-  knoteBody += newKnote.title;
+  if(!_.isEmpty(newKnote.title)) {
+    knoteBody += newKnote.title;
+  }
 
-  if (!_.isEmpty(newKnote.htmlBody) || !_.isEmpty(newKnote.body))
-  knoteBody += "\n\n" + newKnote.htmlBody || newKnote.body || '';
-  var content = getContentAsText(knoteBody) || 'new';
+  if (!_.isEmpty(newKnote.htmlBody) || !_.isEmpty(newKnote.body)) {
+    knoteBody += "<br class='split-body-br'>" + newKnote.htmlBody || newKnote.body || '';
+  }
+
+  var content = knoteBody || 'new';
 
   if (!knote) {
     knote = new KnoteModel(newKnote);
@@ -41,14 +26,8 @@ var _addKnoteOnView = function(knotesView, newKnote) {
     DropboxClient.syncKnote(newKnote);
     knotesView.collection.add(knote);
   } else {
-    // if the knote is currently edited, do nothing
-    var isActiveKnote = (function(activeKnote, newKnote) {
-      if (!activeKnote) return;
-      if (newKnote._id === activeKnote.get('knoteId')) return true;
-    })(_knotesView.activeKnote, newKnote);
     newKnote.content = content;
     DropboxClient.syncKnote(newKnote);
-    if (isActiveKnote) return;
     knote.set({content: content, order: newKnote.order, timestamp: newKnote.timestamp});
   }
 };
@@ -64,18 +43,18 @@ var onNotification = function(knotesView, request, sender, response) {
   var newKnote = request.knote;
   switch(request.msg){
     case 'addKnote':
-    _addKnoteOnView(knotesView, newKnote);
-    break;
+      _addKnoteOnView(knotesView, newKnote);
+      break;
     case 'updateKnote':
-    _addKnoteOnView(knotesView, newKnote);
-    break;
+      _addKnoteOnView(knotesView, newKnote);
+      break;
     case 'removeKnote':
-    _removeKnoteOnView(request.knoteId);
-    break;
+      _removeKnoteOnView(request.knoteId);
+      break;
     default:
-    return;
+      return;
   };
-  console.log("knote message", request.msg, request.knoteId || request.knote._id + request.knote.title);
+  console.log("knote message: ", request.msg, ', ', request.knoteId || request.knote._id, ', ', request.knote && request.knote.title);
 };
 
 var bootstrap = function() {
@@ -108,22 +87,10 @@ $(document).ready(function() {
 
   $("#knote-sync-message").css("visibility", "hidden");
 
-  var _checkLoginForPopup = function(){
-    knoteClient.hasLoggedIn().then(function(loggedIn){
-      if(!loggedIn){
-        chrome.browserAction.setPopup({popup: ''});
-      } else {
-        chrome.browserAction.setPopup({popup: 'views/browseraction-popup.html'});
-      }
-    }).fail(function(){
-      chrome.browserAction.setPopup({popup: ''});
-    });
-  };
-  _checkLoginForPopup();
   if(navigator.onLine === true || !offlineMode.isOfflineMode){
-        //return;
-      offlineMode.syncOfflineKnotes();
-      offlineMode.syncCreateKnotes();
+    //return;
+    offlineMode.syncOfflineKnotes();
+    offlineMode.syncCreateKnotes();
   }
 
   updateHelper.checkNewUpdate();

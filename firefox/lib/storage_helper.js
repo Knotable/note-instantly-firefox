@@ -6,6 +6,7 @@ var ss = require('sdk/simple-storage');
 // ss.on('OverQuota', overQuotaHandler);
 
 function handleStorageSet(request, response) {
+  console.log('> Storage Set: ', request.args);
   var args = request.args;
   for (var key in args) {
     ss.storage[key] = args[key];
@@ -14,6 +15,7 @@ function handleStorageSet(request, response) {
 }
 
 function handleStorageGet(request, response) {
+  console.log('> Storage Get: ', request.args);
   var keys = request.args,
     result = {};
   if (typeof keys == 'string') {
@@ -26,6 +28,7 @@ function handleStorageGet(request, response) {
 }
 
 function handleStorageRemove(request, response) {
+  console.log('> Storage Remove: ', request.args);
   var keys = request.args;
   if (typeof keys == 'string') {
     keys = [keys];

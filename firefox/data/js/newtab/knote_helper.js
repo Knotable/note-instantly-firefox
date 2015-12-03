@@ -7,14 +7,14 @@ window.KnoteHelper = {
   // displaying on right side, Not for storing on db
   getTitleFromContent: function(content){
     var title, temp;
-    if(content.length < 1) return 'Untitled';
+    if(content.length < 1) return 'New';
     var contents = $('<div>').append(content).contents();
     title = $('<div>').append(contents[0]).text().trim();
 
     if(title.length < 1){
       // If there is no title than use body's first few letters
       title = $('<div>').append(content).text().trim();
-      if(title.length < 1) title = 'Untitled';
+      if(title.length < 1) title = 'New';
     }
 
     // If title has newline or carriage return,
@@ -109,9 +109,27 @@ window.KnoteHelper = {
       }
     }
     return false;
+  },
+
+
+
+  getListData: function(){
+    var data = {};
+    var numinc = 1;
+    data.options = new Array();
+    data.title = $('#knote-list-title').val().trim();
+
+    $(".knote-added-list label").each(function(){
+      var checkbox = $(this).parent().find('input');
+      var checked = checkbox.prop('checked');
+      var checkedBy = checkbox.attr('data-checked-by');
+      if(!_.isEmpty($(this).html().trim())){
+        data.options.push({ num:numinc, name:$(this).html().trim(), voters:[checkedBy], checked:checked });
+        numinc++;
+      }
+    });
+    return data;
   }
-
-
 
 };
 

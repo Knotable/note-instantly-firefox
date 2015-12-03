@@ -1,7 +1,7 @@
 {
   "title": "Knotes",
   "name": "note-instantly",
-  "version": "3.1.11",
+  "version": "3.2.0",
   "description": "Super fast notes from your New Tab window",
   "main": "main.js",
   "author": "Knotable",
@@ -13,6 +13,7 @@
   "background": {
     "persistent": true,
     "scripts": [
+      "js/background/config.js",
       "js/vendor/jquery-2.1.4.js",
       "js/vendor/underscore.js",
       "js/vendor/moment-with-locales.js",
@@ -25,11 +26,10 @@
       "js/background/asteroid.js",
 
       "js/background/logger.js",
-      "js/background/config.js",
       "js/background/account-helper.js",
       "js/background/meteorDDP.js",
       "js/background/background.js",
-      "js/background/subscriptions.js",
+      "js/background/reactive_controller.js",
       "js/background/messageManager.js"
     ]
   },

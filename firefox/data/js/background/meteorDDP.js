@@ -1,11 +1,9 @@
 'use strict';
 
-var KnotableMeteor = function() {
+window.knoteServer = (function() {
   /*
   * Set K icon to inactive by default
   */
-  updateIcon(iconStates.loggedOut);
-
   var exports = {};
   var config = getConfig(runtime_mode);
 
@@ -15,6 +13,10 @@ var KnotableMeteor = function() {
 
   exports.getTopicId = function(){
     return asteroid.getTopicId();
+  };
+
+  exports.getUserId = function() {
+    return asteroid.userId;
   };
 
   exports.hasLoggedIn = function(){
@@ -27,7 +29,7 @@ var KnotableMeteor = function() {
 
   exports.addKnote = function(data) {
     var requiredKnoteParams = {
-      subject: data.subject || '',
+      subject: data.subject || 'Knotes',
       from: data.from || AccountHelper.getEmail(),
       to: data.to,
       body: data.htmlBody,
@@ -46,7 +48,7 @@ var KnotableMeteor = function() {
 
     if (!requiredKnoteParams.userId || !requiredKnoteParams.topic_id) {
       console.error('addKnote invalid params: ', requiredKnoteParams);
-      return;
+      return false;
     }
 
     exports.apply('updateNewTabTopicPosition', [requiredKnoteParams.topic_id, 300, 'ext:KnotableMeteor.addKnote']);
@@ -55,6 +57,31 @@ var KnotableMeteor = function() {
     return exports.call("add_knote", requiredKnoteParams, optionalKnoteParams);
   };
 
+  exports.addListKnote = function(data) {
+    var params = {
+      id: asteroid.userId,
+      message_subject: data.subject || 'task',
+      name: AccountHelper.getUsername(),
+      from: data.from || AccountHelper.getEmail(),
+      to: data.to,
+      date: new Date(),
+      title: data.title,
+      isMailgun: false,
+      topic_type: 2,
+      topic_id: asteroid.getTopicId(),
+      pollId: data.checklistId || null,
+      order: data.order,
+      section_id: null,
+      task_type: 'public',
+      options: data.options
+
+    };
+    return exports.call("create_checklist", params);
+  };
+
+  exports.updateList = function (options) {
+    return asteroid.updateList(options);
+  };
 
   exports.updateKnote = function(knoteId, options){
     console.log("MeteorDDP updateKnote", knoteId, options);
@@ -92,6 +119,9 @@ var KnotableMeteor = function() {
     return asteroid.getCollection(pubName).reactiveQuery({}).result;
   };
 
+  exports.getGoogleOauthToken = function(){
+    return asteroid.getGoogleOauthToken();
+  };
 
   exports.getUserInfo = function() {
     if(asteroid.loggedIn){
@@ -101,9 +131,5 @@ var KnotableMeteor = function() {
     }
   };
 
-
-  asteroid.init(config.server);
   return exports;
-
-};
-//Meteor Connectione ends here
+})();

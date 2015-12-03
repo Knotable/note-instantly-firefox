@@ -11,6 +11,8 @@ window.KnotableModels = function() {
     init: function(attrs) {
       if (_.isObject(attrs)) this.set(attrs);
     },
+
+
     defaults: {
       knoteId: '',
       content: '',
@@ -19,6 +21,8 @@ window.KnotableModels = function() {
       updated_date: new Date(),
       timestamp: Date.now()
     },
+
+
     _getKnoteData: function() {
       var to_emails = this.get("to");
       var options = KnoteHelper.getUpdateOptions($('#knote-edit-area'));
@@ -43,6 +47,8 @@ window.KnotableModels = function() {
         to: to_emails
       };
     },
+
+
     _getKnoteListData: function() {
       var to_emails = this.get("to");
       if (to_emails && to_emails.length) {
@@ -63,12 +69,16 @@ window.KnotableModels = function() {
         to: to_emails
       };
     },
+
+
     UUID: function(len) {
       len = len || 5;
       return (new Array(len).join(' ').split(' ')).map(function() {
         return (~~(1e6 * Math.random())).toString(18);
       }).join("-");
     },
+
+
     _thumbnailTemplate: '<p><div' +
       'class="thumbnail-wrapper thumbnail3 uploading-thumb" id="thumb-box-<%- index %>">' +
       '<p id="thumb-box-status-<%- index %>"></p><div class="thumb img-wrapper">' +
@@ -81,35 +91,51 @@ window.KnotableModels = function() {
       '</a>' +
       '</div>' +
       '</div>&nbsp;</p>',
+
+
+    _addKnote: function(topicId, defer) {
+      if (!topicId) {
+        defer.reject('topicId is not found');
+        return;
+      }
+
+      var self = this;
+      var data = _.extend(this.toJSON(), this._getKnoteData());
+      console.log("body", data);
+      data.topicId = topicId;
+      data.topic_id = topicId;
+
+      knoteClient.addKnote(data).then(function(knoteId) {
+        self.set("knoteId", knoteId);
+        defer.resolve(knoteId);
+        self.changed = false;
+      }).fail(function(err) {
+        self.trigger('fail', {
+          reason: 'Saving Knote failed',
+          error: err
+        });
+        defer.reject(err);
+      });
+    },
+
+
     save: function() {
       var defer = new $.Deferred();
-      var self = this,
-      data = _.extend(this.toJSON(), this._getKnoteData());
+      var self = this;
 
-      knoteClient.getTopicId().then(function(topicId) {
-        console.log("body", data);
-        data.topicId = topicId;
-        data.topic_id = topicId;
-
-        if (!data.topicId) {
-          return;
-        }
-
-        knoteClient.addKnote(data).then(function(knoteId) {
-          self.set("knoteId", knoteId);
-          defer.resolve(knoteId);
-          self.changed = false;
-        }).fail(function(err) {
-          self.trigger('fail', {
-            reason: 'Saving Knote failed',
-            error: err
-          });
-          defer.reject(err);
+      if (knoteClient.topicId) {
+        self._addKnote(knoteClient.topicId, defer);
+      } else {
+        knoteClient.getTopicId().then(function(topicId) {
+          knoteClient.topicId = topicId;
+          self._addKnote(topicId, defer);
         });
-      });
+      }
 
       return defer.promise();
     },
+
+
     saveList: function() {
       var defer = new $.Deferred();
       var self = this,
@@ -132,11 +158,17 @@ window.KnotableModels = function() {
       });
       return defer.promise();
     },
+
+
     destroy: function() {
     },
+
+
     validate: function(attrs) {
       if (!attrs.content) return 'empty content';
     },
+
+
     _set: function(obj) {
       for (var k in obj) {
         if (obj.hasOwnProperty(k) && !_.isUndefined(obj[k]) && obj[k] !== this.get(k)) {
@@ -147,6 +179,8 @@ window.KnotableModels = function() {
       }
       return obj;
     },
+
+
     update: function(data) {
       var self = this;
       knoteClient.getUserInfo().then(function(userInfo) {

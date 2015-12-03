@@ -33,9 +33,12 @@ function Newtabs() {
               handleFnCall(msg.args);
               return;
             }
-            msg.tabId = tab.id;
-            // transport the msg to background page
-            backgroundWorker.port.emit('msg', msg)
+            try {
+              msg.tabId = tab.id;
+            } finally {
+              // transport the msg to background page
+              backgroundWorker.port.emit('msg', msg)
+            }
           });
 
           worker.port.on('response:msg', function(msg) {

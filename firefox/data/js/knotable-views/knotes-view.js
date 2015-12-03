@@ -153,7 +153,7 @@ var KnotesView = Backbone.View.extend({
 
 
 
-  createKnote: function(e) {
+  createKnote: function() {
     this.toggleListAreaView(false);
     this.activeKnote = false;
     this._addEmptyKnote();
@@ -657,8 +657,7 @@ var KnotesView = Backbone.View.extend({
 
 
 
-  processList: function(e){
-    var val = $(e.currentTarget).html().trim();
+  processList: function(){
     var self = this;
     if(!self.activeKnote){
       self.createList();

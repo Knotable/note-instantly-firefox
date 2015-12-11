@@ -53,7 +53,7 @@ window.asteroid = (function(){
         var topic = asteroid.getCollection('topics').reactiveQuery({}).result;
         if(topic.length){
           _topicId = topic[0]._id;
-          chrome.storage.local.set({'topicId': topicId});
+          chrome.storage.local.set({'topicId': _topicId});
           chrome.runtime.sendMessage({
             msg: 'topicId',
             topicId: _topicId

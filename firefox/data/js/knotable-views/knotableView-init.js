@@ -81,6 +81,16 @@ var bootstrap = function() {
 
 
 window.config = getConfig(runtime_mode);
+
+window.onbeforeunload = function() {
+  if ($('#knote-edit-area').hasClass('hide')) {
+    window._knotesView.updateList(true);
+    window._knotesView.addNewListItem();
+  } else {
+    window._knotesView.saveCurrentKnote();
+  }
+};
+
 $(document).ready(function() {
   new introBoxView().render();
   chrome.storage.local.set({'isIntroSeen': 'true'});

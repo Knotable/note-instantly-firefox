@@ -20,16 +20,40 @@ var _addKnoteOnView = function(knotesView, newKnote) {
       content: content,
       knoteId: newKnote._id,
       collection: knotesView.collection,
-      date: newKnote.date
+      date: newKnote.date,
+      lastSync: newKnote.updated_date
     });
     newKnote.content = content;
     DropboxClient.syncKnote(newKnote);
     knotesView.collection.add(knote);
   } else {
-    newKnote.content = content;
     DropboxClient.syncKnote(newKnote);
-    knote.set({content: content, order: newKnote.order, timestamp: newKnote.timestamp});
+    //if ((!knotesView.activeKnote || knotesView.activeKnote.get('knoteId') !== newKnote._id) && knote.get('type') != 'checklist'){
+    if (knote.get('type') != 'checklist'){
+      knote.set({content: content, order: newKnote.order, timestamp: newKnote.timestamp});
+    }
+
+    if(knote.get('type') == "checklist" && moment(knote.get('updated_date')).isBefore(newKnote.updated_date, 'second')){
+      console.log("#GC - _addKnoteOnView - updating checklist", knote.get('updated_date'),  newKnote.updated_date);
+      knote.set({title: newKnote.title, options: newKnote.options, order: newKnote.order, timestamp: newKnote.timestamp, updated_date: newKnote.updated_date});
+      // if list is currently on active view,
+      // update the view
+      if (knotesView.activeKnote && knotesView.activeKnote.get('knoteId') == newKnote._id ){
+        $('.list-knote[data-knoteid=' + newKnote._id + ']').click();
+      }
+    }
+
+    // update the last sync time
+    knote.set({lastSync: newKnote.updated_date});
+    // if it is active knote update the UI timestamp for last sync
+    /*
+    if (knotesView.activeKnote && knotesView.activeKnote.get('knoteId') == newKnote._id ){
+      $(".last-save").text(moment(newKnote.updated_date).format("Mo MMM, h:m A"));
+    }
+    */
+
   }
+
 };
 
 var onNotification = function(knotesView, request, sender, response) {

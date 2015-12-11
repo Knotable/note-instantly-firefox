@@ -9,6 +9,12 @@ window.KnotableModels = function() {
 
   _models.Knote = _models.baseModel.extend({
     init: function(attrs) {
+      var date = new Date();
+      _.defaults(attrs, {
+        date: date,
+        updated_date: date,
+        timestamp: date.getTime()
+      });
       if (_.isObject(attrs)) this.set(attrs);
     },
 
@@ -16,10 +22,7 @@ window.KnotableModels = function() {
     defaults: {
       knoteId: '',
       content: '',
-      body: '<p></p>',
-      date: new Date(),
-      updated_date: new Date(),
-      timestamp: Date.now()
+      body: '<p></p>'
     },
 
 

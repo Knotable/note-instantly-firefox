@@ -379,6 +379,10 @@ var KnotesView = Backbone.View.extend({
     }
     if(knoteId && knoteHasChanged){
       this._showSyncLoader();
+      this.activeKnote.set({
+        updated_date: Date.now(),
+        content: $("#knote-edit-area").html().trim()
+      });
       knoteClient.updateKnote(knoteId, options)
         .then(function(){
           console.log("Update knote", knoteId, " Success!");

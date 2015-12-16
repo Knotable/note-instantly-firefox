@@ -7,13 +7,14 @@ var KnotesView = Backbone.View.extend({
     'click #btn-delete-knote': 'deleteKnote',
     'focus #knote-edit-area': 'ensureLoggingIn',
     'focusout #knote-edit-area': 'saveCurrentKnote',
+    'keyup #knote-edit-area': 'syncTitleToRight',
 
-    'keyup #knote-list-title': 'processList',
+    'keyup #knote-list-title': 'syncTitleToRight',
     'click #add-list-item': 'addNewListItem',
     "click .remove-list-item": "removeListItem",
     'focus #knote-list-title': 'ensureLoggingIn',
     'focus #knote-add-list-textarea': 'ensureLoggingIn',
-    'focusout #knote-list-title': function(){this.updateList(true)},
+    'focusout #knote-list-title': 'saveCurrentTask',
     'change .list-checkbox': 'changeCheck',
     'click #btn-list-knote': 'addListUI',
     'click #btn-add-option': 'toggleAddDropdown',
@@ -525,7 +526,7 @@ var KnotesView = Backbone.View.extend({
     //this.$el.find(".new-knote.active").removeClass("active").addClass("hide");
     self.$el.find('.new-knote.active').remove();
 
-    if(activeKnote.get('type')=="checklist"){
+    if(activeKnote.get('type')=="checklist") {
       self.cleanAddingListArea();
       self.toggleListAreaView(true);
       self.$el.find('#knote-list-title').val(activeKnote.get('title')).focus().removeClass("textarea_error").trigger('input');
@@ -535,7 +536,7 @@ var KnotesView = Backbone.View.extend({
           self.addListItemToUI(item.name, item.checked, item.voters[0])
         })
       }
-    }else{
+    } else {
       self.toggleListAreaView(false);
       self.cleanAddingListArea();
       self.$el.find('#knote-edit-area').html(activeKnote.get('content'));
@@ -543,7 +544,7 @@ var KnotesView = Backbone.View.extend({
     }
 
     self.collection.each(function(model, collection) {
-      model.trigger('activate', model === activeKnote);
+      model.trigger('activate', model.get('knoteId') === activeKnote.get('knoteId'));
     });
 
     self.$el.find('#btn-email-knote,#btn-delete-knote').removeAttr('disabled');
@@ -661,13 +662,15 @@ var KnotesView = Backbone.View.extend({
 
 
 
-  processList: function(){
+  syncTitleToRight: function(e){
     var self = this;
-    if(!self.activeKnote){
-      self.createList();
-    }else {
-      self.updateList(false);
+    var node = $(e.currentTarget);
+    if (node.attr('id') == 'knote-edit-area') {
+      title = KnoteHelper.getTitleFromContent(node.html().trim());
+    } else {
+      title = KnoteHelper.getTrimTitle(node.val());
     }
+    $('.list-knote.active .body strong').text(title);
   },
 
 
@@ -691,6 +694,17 @@ var KnotesView = Backbone.View.extend({
       self.setActiveKnote(newKnote);
       console.log("saved list knote and added to collection",newKnote);
     });
+  },
+
+
+
+  saveCurrentTask: function() {
+    var self = this;
+    if(!self.activeKnote){
+      self.createList();
+    }else {
+      self.updateList(true);
+    }
   },
 
 

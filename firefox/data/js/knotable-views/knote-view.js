@@ -51,13 +51,15 @@ var KnoteView = Backbone.View.extend({
   },
   render: function() {
     var id = this.model.get('knoteId') || this.model.get('_id');
-    if (this.$el.data('knoteid') == '' &&
-       id && id != 'true' && $('.list-knote[data-knoteid=' + id + ']').length) {
+    var $knote = $('.list-knote[data-knoteid=' + id + ']');
+    var existClass = $knote.attr('class');
+    if (this.$el.data('knoteid') == '' && id && id != 'true' && $knote.length) {
       this.remove();
     } else {
       var newElm = $(this.template(this.model.toJSON()));
       this.$el.replaceWith(newElm);
       this.setElement(newElm);
+      $('.list-knote[data-knoteid=' + id + ']').addClass(existClass);
     }
 
     var newContent = this.model.get('content');

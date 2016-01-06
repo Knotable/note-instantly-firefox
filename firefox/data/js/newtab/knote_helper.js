@@ -24,6 +24,15 @@ window.KnoteHelper = {
       title = title.slice(0, temp)
     }
 
+    return this.getTrimTitle(title);
+  },
+
+
+
+  getTrimTitle: function(title) {
+    if (typeof title == 'undefined' || title.length < 1) {
+      title = 'New';
+    }
     return title.length < 25 ? title : title.substr(0, 23) + '...' ;
   },
 
@@ -33,8 +42,7 @@ window.KnoteHelper = {
     var title;
     if(typeof self.attributes.type != 'undefined' && self.attributes.type == 'checklist' ){
       title = self.attributes.title;
-      if(typeof title == 'undefined') title = 'Untitled'
-      return title.length < 25 ? title : title.substr(0, 23) + '...' ;
+      return this.getTrimTitle(title);
     }else{
       if(typeof self.attributes.content == 'undefined') return "Untitled";
       return this.getTitleFromContent(self.attributes.content);

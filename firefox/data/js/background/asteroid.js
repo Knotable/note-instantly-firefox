@@ -97,7 +97,7 @@ window.asteroid = (function(){
 
     asteroidDDP.on("reconnected", function(){
       console.info("Asteroid reconnected!");
-      MessageManager.connected();
+      MessageManager.reconnected();
     });
 
     asteroidDDP.on("logout", onLogout);

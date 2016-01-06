@@ -152,13 +152,13 @@
     var _this = this;
 		if (this._reconnect_count < RECONNECT_ATTEMPTS_BEFORE_PLATEAU) {
 			setTimeout(function() {
-        _this.connect.bind(_this);
+        _this.connect.bind(_this)();
       }, this._reconnect_incremental_timer);
 			this._reconnect_count += 1;
 			this._reconnect_incremental_timer += TIMER_INCREMENT * this._reconnect_count;
 		} else {
 			setTimeout(function() {
-        _this.connect.bind(_this);
+        _this.connect.bind(_this)();
       }, this._reconnect_incremental_timer);
 		}
 	};

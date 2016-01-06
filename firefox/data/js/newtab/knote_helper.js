@@ -78,8 +78,14 @@ window.KnoteHelper = {
 
 
 
-  getKnoteUpdateOptions: function() {
-    var $ele = $('#knote-edit-area');
+  getKnoteOptions: function(textContent) {
+    var $ele;
+    if (textContent) {
+      $ele = $('<div>');
+      $ele.html(textContent);
+    } else {
+      $ele = $('#knote-edit-area');
+    }
     var data = {};
     var body = '';
     var title, temp;
@@ -144,7 +150,7 @@ window.KnoteHelper = {
 
   getUpdateOptions: function(){
     if ($('#knote-edit-area').is(':visible')) {
-      return this.getKnoteUpdateOptions();
+      return this.getKnoteOptions();
     } else {
       return this.getListData();
     }

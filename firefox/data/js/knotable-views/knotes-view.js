@@ -400,18 +400,21 @@ var KnotesView = Backbone.View.extend({
 
 
   _updateKnote: function(callback){
-    var options = KnoteHelper.getKnoteUpdateOptions();
+    var options = KnoteHelper.getKnoteOptions();
+    var oldOptions = KnoteHelper.getKnoteOptions(this.activeKnote.get('content'));
     var knoteId = this.activeKnote.get("_id") || this.activeKnote.get("knoteId");
     var knoteHasChanged = true;
+    var content = $("#knote-edit-area").html().trim();
 
-    if (options.title === this.activeKnote.get("title") && options.htmlBody === this.activeKnote.get("htmlBody")){
+    if (options.title === oldOptions.title && options.htmlBody === oldOptions.htmlBody){
       knoteHasChanged = false;
     }
+
     if(knoteId && knoteHasChanged){
       this._showSyncLoader();
       this.activeKnote.set({
         updated_date: Date.now(),
-        content: $("#knote-edit-area").html().trim()
+        content: content
       });
       knoteClient.updateKnote(knoteId, options)
         .then(function(){

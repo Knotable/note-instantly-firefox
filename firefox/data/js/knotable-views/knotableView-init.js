@@ -64,6 +64,10 @@ var onNotification = function(knotesView, request, sender, response) {
     knotesView.collection.remove(knote);
   };
 
+  if (offlineMode.isOffline()) {
+    return;
+  }
+
   var newKnote = request.knote;
   switch(request.msg){
     case 'addKnote':

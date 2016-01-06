@@ -52,7 +52,34 @@ window.KnoteHelper = {
 
 
 
-  getUpdateOptions: function($ele){
+  setCursorOnContentEditable : function($ele) {
+    var range, sel, textRange;
+    $ele.focus();
+    if( (typeof(window.getSelection) != "undefined") && (typeof(document.createRange) != "undefined")){
+      // IE 9 and non-IE
+      range = document.createRange();
+      range.selectNodeContents($ele);
+      range.collapse(false);
+      sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    else{
+      if (typeof document.body.createTextRange != "undefined"){
+        // IE < 9
+        textRange = document.body.createTextRange();
+        textRange.moveToElementText($ele);
+        textRange.collapse(false);
+        textRange.select();
+      }
+    }
+    return false;
+  },
+
+
+
+  getKnoteUpdateOptions: function() {
+    var $ele = $('#knote-edit-area');
     var data = {};
     var body = '';
     var title, temp;
@@ -95,32 +122,6 @@ window.KnoteHelper = {
 
 
 
-  setCursorOnContentEditable : function($ele){
-    var range, sel, textRange;
-    $ele.focus();
-    if( (typeof(window.getSelection) != "undefined") && (typeof(document.createRange) != "undefined")){
-      // IE 9 and non-IE
-      range = document.createRange();
-      range.selectNodeContents($ele);
-      range.collapse(false);
-      sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-    else{
-      if (typeof document.body.createTextRange != "undefined"){
-        // IE < 9
-        textRange = document.body.createTextRange();
-        textRange.moveToElementText($ele);
-        textRange.collapse(false);
-        textRange.select();
-      }
-    }
-    return false;
-  },
-
-
-
   getListData: function(){
     var data = {};
     var numinc = 1;
@@ -137,8 +138,17 @@ window.KnoteHelper = {
       }
     });
     return data;
-  }
+  },
 
+
+
+  getUpdateOptions: function(){
+    if ($('#knote-edit-area').is(':visible')) {
+      return this.getKnoteUpdateOptions();
+    } else {
+      return this.getListData();
+    }
+  }
 };
 
 })(window, jQuery);

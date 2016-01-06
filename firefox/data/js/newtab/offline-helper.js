@@ -5,26 +5,22 @@ window.offlineMode = (function(){
 
   exports.isOfflineMode = false;
 
-  exports.isOffline = function(){
-    if(navigator.onLine === false || exports.isOfflineMode){
+  exports.isOffline = function() {
+    if (navigator.onLine === false || exports.isOfflineMode) {
       exports.isOfflineMode = true;
       return exports.isOfflineMode;
-    }
-
-    else{
+    } else {
       exports.isOfflineMode = false;
       return exports.isOfflineMode;
     }
   };
 
   exports.syncOfflineKnotes = function(){
-
     chrome.storage.local.get('offlineEditKnotes', function (result) {
       if(!result.offlineEditKnotes){
         return;
       }
       for(var i = 0; i < result.offlineEditKnotes.length; i++){
-
         knoteClient.updateKnote(result.offlineEditKnotes[i].knoteId, result.offlineEditKnotes[i].knoteId)
         .then(function(){
           console.log("Update knote", result.offlineEditKnotes[i].knoteId, " Success!");

@@ -28,7 +28,7 @@ window.KnotableModels = function() {
 
     _getKnoteData: function() {
       var to_emails = this.get("to");
-      var options = KnoteHelper.getUpdateOptions($('#knote-edit-area'));
+      var options = KnoteHelper.getUpdateOptions();
       
       if (to_emails && to_emails.length) {
         to_emails = to_emails.map(function(emailAddress) {

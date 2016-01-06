@@ -24,6 +24,11 @@ var KnotesView = Backbone.View.extend({
 
 
   saveCurrentKnote: function(callback){
+    /*
+    if (offlineMode.isOffline()) {
+      this._updateKnoteOffline();
+    }
+    */
     if(this.activeKnote){
       this._updateKnote(callback);
     } else {
@@ -252,7 +257,7 @@ var KnotesView = Backbone.View.extend({
     chrome.storage.local.get('offlineCreateKnotes', function (items) {
       var result = items['offlineCreateKnotes'];
       if(!_.isEmpty(result)){
-        self.offlineCreateKnotes = result.offlineCreateKnotes;
+        self.offlineCreateKnotes = result;
       }
 
       // if(!window.currentLocalKnote){
@@ -310,16 +315,17 @@ var KnotesView = Backbone.View.extend({
     chrome.storage.local.get('offlineEditKnotes', function (items) {
       var result = items['offlineEditKnotes'];
       if(!_.isEmpty(result)){
-        self.offlineEditKnotes = result.offlineEditKnotes;
+        self.offlineEditKnotes = result;
       }
       var matchedKnotes = _.findWhere(self.offlineEditKnotes, {'knoteID':knoteId});
+      var updateOptions = KnoteHelper.getUpdateOptions();
 
       if (matchedKnotes) {
-        matchedKnotes.updateOptions = KnoteHelper.getUpdateOptions($("#knote-edit-area"));
+        matchedKnotes.updateOptions = updateOptions;
       } else {
         var offlineKnote = {
           knoteID: knoteId,
-          updateOptions: KnoteHelper.getUpdateOptions($("#knote-edit-area"))
+          updateOptions: updateOptions
         };
 
         self.offlineEditKnotes.push(offlineKnote);
@@ -394,7 +400,7 @@ var KnotesView = Backbone.View.extend({
 
 
   _updateKnote: function(callback){
-    var options = KnoteHelper.getUpdateOptions($("#knote-edit-area"));
+    var options = KnoteHelper.getKnoteUpdateOptions();
     var knoteId = this.activeKnote.get("_id") || this.activeKnote.get("knoteId");
     var knoteHasChanged = true;
 
@@ -727,6 +733,11 @@ var KnotesView = Backbone.View.extend({
 
   saveCurrentTask: function() {
     var self = this;
+    /*
+    if (offlineMode.isOffline()) {
+      self._updateKnoteOffline();
+    }
+    */
     if(!self.activeKnote){
       self.createList();
     }else {

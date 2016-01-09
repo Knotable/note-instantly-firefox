@@ -98,6 +98,7 @@ window.MessageManager = (function(){
       msg: "connected"
     };
     hasDisconnectedMsgShown = false;
+    window.sendAndClearOfflineKnotes();
     sendMessageToNewTabPage(message);
   };
 

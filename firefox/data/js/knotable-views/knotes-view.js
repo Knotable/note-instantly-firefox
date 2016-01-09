@@ -400,42 +400,39 @@ var KnotesView = Backbone.View.extend({
 
 
   _updateKnote: function(callback){
+    var knoteId = this.activeKnote.get("_id") || this.activeKnote.get("knoteId");
+    if (!knoteId) return;
     var options = KnoteHelper.getKnoteOptions();
     var oldOptions = KnoteHelper.getKnoteOptions(this.activeKnote.get('content'));
-    var knoteId = this.activeKnote.get("_id") || this.activeKnote.get("knoteId");
-    var knoteHasChanged = true;
     var content = $("#knote-edit-area").html().trim();
 
     if (options.title === oldOptions.title && options.htmlBody === oldOptions.htmlBody){
-      knoteHasChanged = false;
-    }
-
-    if(knoteId && knoteHasChanged){
-      this._showSyncLoader();
-      this.activeKnote.set({
-        updated_date: Date.now(),
-        content: content
-      });
-      knoteClient.updateKnote(knoteId, options)
-        .then(function(){
-          console.log("Update knote", knoteId, " Success!");
-          window._knotesView._hideSyncLoader();
-          if (_.isFunction(callback)) {
-            callback(true);
-          }
-        })
-        .fail(function(){
-          console.error("Update knote", knoteId, " FAILED!");
-          window._knotesView._hideSyncLoader();
-          if (_.isFunction(callback)) {
-            callback(false);
-          }
-        });
-    } else {
       if (_.isFunction(callback)) {
         callback(false);
       }
+      return;
     }
+
+    this._showSyncLoader();
+    this.activeKnote.set({
+      updated_date: Date.now(),
+      content: content
+    });
+    knoteClient.updateKnote(knoteId, options)
+      .then(function(id){
+        console.log("Update knote", knoteId, " Success!");
+        window._knotesView._hideSyncLoader();
+        if (_.isFunction(callback)) {
+          callback(true);
+        }
+      })
+      .fail(function(){
+        console.error("Update knote", knoteId, " FAILED!");
+        window._knotesView._hideSyncLoader();
+        if (_.isFunction(callback)) {
+          callback(false);
+        }
+      });
   },
 
 
@@ -476,6 +473,12 @@ var KnotesView = Backbone.View.extend({
 
   onKnoteAdded: function(model) {
     if ( model.get('archived') ) {
+      return this;
+    }
+
+    if (!offlineMode.isOffline() && model.get('__offline__')) {
+      model.destroy();
+      window._knotesView.collection.remove(model);
       return this;
     }
 

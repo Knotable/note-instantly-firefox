@@ -29,6 +29,7 @@ var KnoteView = Backbone.View.extend({
     });
     this.model.bind('change', this.render, this);
     this.model.bind('destroy', this.remove, this);
+    this.model.bind('remove', this.remove, this);
     this.model.bind('toggleView', this.toggleView, this);
     this.model.bind('activate', this.activate, this);
 

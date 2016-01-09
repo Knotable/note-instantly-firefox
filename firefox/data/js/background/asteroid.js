@@ -92,11 +92,13 @@ window.asteroid = (function(){
 
     asteroidDDP.on("connected", function(){
       console.info("Asteroid connected!");
+      asteroid.isConnected = true;
       MessageManager.connected();
     });
 
     asteroidDDP.on("reconnected", function(){
       console.info("Asteroid reconnected!");
+      asteroid.isConnected = true;
       MessageManager.reconnected();
     });
 
@@ -104,11 +106,13 @@ window.asteroid = (function(){
 
     asteroidDDP.ddp.on("socket_error", function(){
       console.error("socket_error");
+      asteroid.isConnected = false;
       MessageManager.disconnected();
     });
 
     asteroidDDP.ddp.on("socket_close", function(){
       console.error("socket_close");
+      asteroid.isConnected = false;
       MessageManager.disconnected();
     });
 
@@ -125,6 +129,11 @@ window.asteroid = (function(){
 
   exports.getPadLink = function(){
     reactiveController.loadKnotesOnClient();
+    if (!asteroid.isConnected) {
+      chrome.runtime.sendMessage({
+        msg: "disconnected"
+      });
+    }
     var topicsCollection = asteroid.getCollection('topics');
     var topicQuery = topicsCollection.reactiveQuery({_id: _topicId});
     var padLink = config.protocol + "://" + config.domain;
@@ -250,8 +259,7 @@ window.asteroid = (function(){
         console.log("Asteroid:updateKnote I", knoteId, options);
         return knotesCollection.update(knoteId, options).local;
       }
-    } else
-    {
+    } else {
       return null;
     }
   };

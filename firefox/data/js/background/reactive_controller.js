@@ -40,7 +40,7 @@ window.reactiveController = (function(){
 
   var _watchKnotes = function(knotesQuery){
     var _removedKnoteId = null;
-    var _knoteId = null;
+    var _idOfKnoteToUpdate = null;
     // send knotes from ddp message
     knotesQuery.on("change", function(knoteId){
       var knote = _.find(knotesQuery.result, function(knote){
@@ -48,16 +48,21 @@ window.reactiveController = (function(){
       });
 
       if (knoteId.match('__upd__') && knote){
-        _knoteId = knote._id;
-        _updateKnote(knote);
+        _idOfKnoteToUpdate = knote._id;
+      } else if (knoteId.match('__del__')){
+        knoteId = knoteId.match(/(.*)__del__/)[1];
+        _removedKnoteId = knoteId;
+        _removedKnote(knoteId);
       } else if (knote) {
-        if(!_.contains([_removedKnoteId, _knoteId], knote._id)){
+        if (_idOfKnoteToUpdate == knote._id) {
+          _idOfKnoteToUpdate = null;
+          _updateKnote(knote);
+        } else if (!_.contains([_removedKnoteId], knote._id)){
           _addedKnote(knote);
         } else {
           _removedKnoteId = null;
-          _knoteId = null;
         }
-      } else {
+      } else if (knoteId) {
         _removedKnoteId = knoteId;
         _removedKnote(knoteId);
       }
@@ -71,7 +76,7 @@ window.reactiveController = (function(){
       console.log("Subscription: Added knote: skip archived knote", knote._id);
       return true;
     }
-    console.log("Subscription: -> Added Knote: ", knote);
+    console.log("Subscription: -> Added Knote: ", knote.title);
     chrome.runtime.sendMessage({
       msg: 'addKnote',
       knote: knote

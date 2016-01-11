@@ -310,7 +310,7 @@ window.asteroid = (function(){
     }
     updateOption.updated_date = Date.now();
     console.log("updateList - ", updateOption);
-    knotes._localToRemoteUpdate(options.knoteId, updateOption);
+    knotes.update(options.knoteId, updateOption).local;
   };
 
   exports.init(config.server);

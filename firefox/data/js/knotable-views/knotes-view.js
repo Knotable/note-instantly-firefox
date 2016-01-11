@@ -438,6 +438,8 @@ var KnotesView = Backbone.View.extend({
 
 
   _sortKnotesList: function(){
+    var self = this;
+    var activeKnote = this.activeKnote;
     var $knotes = this.$el.find('#knotes-list');
     var $knotesLi = $knotes.find("li");
     $knotesLi.sort(function(knoteA, knoteB){
@@ -467,6 +469,15 @@ var KnotesView = Backbone.View.extend({
       return 0;
     });
     $knotesLi.detach().appendTo($knotes);
+    if (activeKnote) {
+      this.collection.each(function(model, collection) {
+        var isSame = model.get('knoteId') === activeKnote.get('knoteId');
+        if (isSame) {
+          self.activeKnote = model;
+        }
+        model.trigger('activate', isSame);
+      });
+    }
   },
 
 
@@ -480,6 +491,12 @@ var KnotesView = Backbone.View.extend({
       model.destroy();
       window._knotesView.collection.remove(model);
       return this;
+    }
+
+    var id = model.get('knoteId') || model.get('_id');
+    var $knote = $('.list-knote[data-knoteid=' + id + ']');
+    if ($knote.length) {
+      return;
     }
 
     var knoteView = new KnoteView(model);
@@ -501,7 +518,14 @@ var KnotesView = Backbone.View.extend({
 
 
 
-  onKnoteChanged: function(knote, collection, idx) {
+  onKnoteChanged: function(model, collection, idx) {
+    var newContent = model.get('content');
+    var editArea = $('#knote-edit-area');
+    if (this.activeKnote == model) {
+      if (editArea.is(':visible') && newContent != editArea.html().trim()) {
+        editArea.html(newContent);
+      }
+    }
     this._sortKnotesList();
   },
 
@@ -548,6 +572,7 @@ var KnotesView = Backbone.View.extend({
   setActiveKnote: function(id) {
     var activeKnote;
     var self = this;
+    var taskTitle = self.$el.find('#knote-list-title');
     if (id instanceof(KnoteModel)) {
       activeKnote = id;
     } else {
@@ -558,13 +583,14 @@ var KnotesView = Backbone.View.extend({
     if (!activeKnote) return;
     self._removeKnoteIfEmptyContent();
     self.activeKnote = activeKnote;
-    //this.$el.find(".new-knote.active").removeClass("active").addClass("hide");
     self.$el.find('.new-knote.active').remove();
 
     if(activeKnote.get('type')=="checklist") {
       self.cleanAddingListArea();
-      self.toggleListAreaView(true);
-      self.$el.find('#knote-list-title').val(activeKnote.get('title')).focus().removeClass("textarea_error").trigger('input');
+      if (!taskTitle.is(':visible')) {
+        self.toggleListAreaView(true);
+      }
+      taskTitle.val(activeKnote.get('title'));
       var options = activeKnote.get('options');
       if(typeof options != 'undefined') {
         options.forEach(function(item, index){
@@ -572,7 +598,9 @@ var KnotesView = Backbone.View.extend({
         })
       }
     } else {
-      self.toggleListAreaView(false);
+      if (taskTitle.is(':visible')) {
+        self.toggleListAreaView(false);
+      }
       self.cleanAddingListArea();
       self.$el.find('#knote-edit-area').html(activeKnote.get('content'));
       KnoteHelper.setCursorOnContentEditable($('#knote-edit-area')[0]);
@@ -725,7 +753,7 @@ var KnotesView = Backbone.View.extend({
         title: listData.title,
         type: 'checklist',
         topicId: topicId,
-        options: listData.options.length?listData.options:[]
+        options: listData.options.length ? listData.options : []
       });
 
       newKnote.saveList();
@@ -884,9 +912,10 @@ var KnotesView = Backbone.View.extend({
 
 
   addListUI: function(e){
+    this.activeKnote = null;
     this.cleanAddingListArea();
     this.toggleListAreaView(true);
-    this.activeKnote = null;
+    this._addEmptyKnote();
   },
 
 

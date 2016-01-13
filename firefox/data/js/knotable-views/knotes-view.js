@@ -20,13 +20,24 @@ var KnotesView = Backbone.View.extend({
     'click #btn-add-option': 'toggleAddDropdown',
     'keyup #knote-add-list-textarea': 'listenTaskItemKey'
   },
+
+
+
   saveCurrentKnote: function(callback){
+    /*
+    if (offlineMode.isOffline()) {
+      this._updateKnoteOffline();
+    }
+    */
     if(this.activeKnote){
       this._updateKnote(callback);
     } else {
       this._addNewKnote(callback);
     }
   },
+
+
+
   ensureLoggingIn: function() {
     var self = this;
     knoteClient.hasLoggedIn().then(function(loggedIn){
@@ -42,6 +53,9 @@ var KnotesView = Backbone.View.extend({
         new self.LoginView().show();
     });
   },
+
+
+
   emailKnote: function() {
     var self = this;
     gapi.auth.authorize({client_id: GoogleOauthHelper.getClientId(), scope: GoogleOauthHelper.getScopes(), immediate: true}, function(authResult){
@@ -90,6 +104,8 @@ var KnotesView = Backbone.View.extend({
 
   },
 
+
+
   _randomLocalKnoteID: function (L){
       var s= '';
       var randomchar=function(){
@@ -101,43 +117,6 @@ var KnotesView = Backbone.View.extend({
       while(s.length< L) s+= randomchar();
       return s;
     },
-
-  _createKnoteOffline: function(){
-    var self = this;
-    self.offlineCreateKnotes = [];
-    chrome.storage.local.get('offlineCreateKnotes', function (items) {
-      var result = items['offlineCreateKnotes'];
-      if(!_.isEmpty(result)){
-        self.offlineCreateKnotes = result.offlineCreateKnotes;
-      }
-
-      // if(!window.currentLocalKnote){
-      //   window.currentLocalKnote = self._randomLocalKnoteID(10);
-      // }
-
-      knoteClient.getTopicId().then(function(topicId) {
-        var knote = {
-          "localID": self.localKnoteID,
-          "subject":"",
-          "body":"",
-          "htmlBody":$("#knote-edit-area").html().trim(),
-          "topic_id": topicId
-        };
-
-        var matchedKnotes = _.findWhere(self.offlineCreateKnotes, {'localID':knote.localID});
-
-        if(matchedKnotes){
-          console.log("***********************")
-          console.log(matchedKnotes)
-          console.log("***********************")
-          matchedKnotes.htmlBody = $("#knote-edit-area").html().trim();
-        } else{
-          self.offlineCreateKnotes.push(knote);
-        }
-        chrome.storage.local.set({'offlineCreateKnotes': self.offlineCreateKnotes});
-      });
-    });
-  },
 
 
 
@@ -190,6 +169,8 @@ var KnotesView = Backbone.View.extend({
 
     }
   },
+
+
 
   initialize: function(knotesCollection) {
     var self = this;
@@ -270,6 +251,45 @@ var KnotesView = Backbone.View.extend({
 
 
 
+  _createKnoteOffline: function(){
+    var self = this;
+    self.offlineCreateKnotes = [];
+    chrome.storage.local.get('offlineCreateKnotes', function (items) {
+      var result = items['offlineCreateKnotes'];
+      if(!_.isEmpty(result)){
+        self.offlineCreateKnotes = result;
+      }
+
+      // if(!window.currentLocalKnote){
+      //   window.currentLocalKnote = self._randomLocalKnoteID(10);
+      // }
+
+      knoteClient.getTopicId().then(function(topicId) {
+        var knote = {
+          "localID": self.localKnoteID,
+          "subject":"",
+          "body":"",
+          "htmlBody":$("#knote-edit-area").html().trim(),
+          "topic_id": topicId
+        };
+
+        var matchedKnotes = _.findWhere(self.offlineCreateKnotes, {'localID':knote.localID});
+
+        if(matchedKnotes){
+          console.log("***********************")
+          console.log(matchedKnotes)
+          console.log("***********************")
+          matchedKnotes.htmlBody = $("#knote-edit-area").html().trim();
+        } else{
+          self.offlineCreateKnotes.push(knote);
+        }
+        chrome.storage.local.set({'offlineCreateKnotes': self.offlineCreateKnotes});
+      });
+    });
+  },
+
+
+
   _clearOfflineKnotes: function(){
     chrome.storage.local.set({'offlineEditKnotes': []});
   },
@@ -277,50 +297,53 @@ var KnotesView = Backbone.View.extend({
 
 
   _updateKnoteOffline: function(){
-     var self = this;
-     self.offlineEditKnotes = []
+    var self = this;
+    self.offlineEditKnotes = []
 
-     if(!self.activeKnote){
-       this._createKnoteOffline();
-       return;
-     }
+    if(!self.activeKnote){
+      this._createKnoteOffline();
+      return;
+    }
 
-     var knoteId = self.activeKnote.get("_id") || self.activeKnote.get("knoteId");
+    var knoteId = self.activeKnote.get("_id") || self.activeKnote.get("knoteId");
 
-     if(!knoteId){
-       this._createKnoteOffline();
-       return;
-     }
+    if(!knoteId){
+      this._createKnoteOffline();
+      return;
+    }
 
-     chrome.storage.local.get('offlineEditKnotes', function (items) {
-       var result = items['offlineEditKnotes'];
-       if(!_.isEmpty(result)){
-         self.offlineEditKnotes = result.offlineEditKnotes;
-       }
-       var matchedKnotes = _.findWhere(self.offlineEditKnotes, {'knoteID':knoteId});
+    chrome.storage.local.get('offlineEditKnotes', function (items) {
+      var result = items['offlineEditKnotes'];
+      if(!_.isEmpty(result)){
+        self.offlineEditKnotes = result;
+      }
+      var matchedKnotes = _.findWhere(self.offlineEditKnotes, {'knoteID':knoteId});
+      var updateOptions = KnoteHelper.getUpdateOptions();
 
-       if (matchedKnotes) {
-         matchedKnotes.updateOptions = KnoteHelper.getUpdateOptions($("#knote-edit-area"));
-       }
+      if (matchedKnotes) {
+        matchedKnotes.updateOptions = updateOptions;
+      } else {
+        var offlineKnote = {
+          knoteID: knoteId,
+          updateOptions: updateOptions
+        };
 
-      else{
-         var offlineKnote = {
-           knoteID: knoteId,
-           updateOptions: KnoteHelper.getUpdateOptions($("#knote-edit-area"))
-         };
-
-         self.offlineEditKnotes.push(offlineKnote);
+        self.offlineEditKnotes.push(offlineKnote);
       }
       chrome.storage.local.set({'offlineEditKnotes': self.offlineEditKnotes});
 
-     });
+    });
   },
+
+
 
   _updateKnoteOnBackground: _.debounce(function(e){
     if(this.activeKnote){
       this._updateKnote();
     }
   }, 2 * 60 * 1000),
+
+
 
   _addNewKnote: function(callback) {
     var self = this;
@@ -362,53 +385,61 @@ var KnotesView = Backbone.View.extend({
     googleAnalyticsHelper.trackAnalyticsEvent('knote', 'created');
   },
 
+
+
   _showSyncLoader: function(){
     $("#knote-sync-message").css("visibility", "block").fadeIn("slow");
   },
+
+
 
   _hideSyncLoader: function(){
     $("#knote-sync-message").css("visibility", "hidden").fadeIn("slow");
   },
 
-  _updateKnote: function(callback){
-    var options = KnoteHelper.getUpdateOptions($("#knote-edit-area"));
-    var knoteId = this.activeKnote.get("_id") || this.activeKnote.get("knoteId");
-    var knoteHasChanged = true;
 
-    if (options.title === this.activeKnote.get("title") && options.htmlBody === this.activeKnote.get("htmlBody")){
-      knoteHasChanged = false;
-    }
-    if(knoteId && knoteHasChanged){
-      this._showSyncLoader();
-      this.activeKnote.set({
-        updated_date: Date.now(),
-        content: $("#knote-edit-area").html().trim()
-      });
-      knoteClient.updateKnote(knoteId, options)
-        .then(function(){
-          console.log("Update knote", knoteId, " Success!");
-          window._knotesView._hideSyncLoader();
-          if (_.isFunction(callback)) {
-            callback(true);
-          }
-        })
-        .fail(function(){
-          console.error("Update knote", knoteId, " FAILED!");
-          window._knotesView._hideSyncLoader();
-          if (_.isFunction(callback)) {
-            callback(false);
-          }
-        });
-    } else {
+
+  _updateKnote: function(callback){
+    var knoteId = this.activeKnote.get("_id") || this.activeKnote.get("knoteId");
+    if (!knoteId) return;
+    var options = KnoteHelper.getKnoteOptions();
+    var oldOptions = KnoteHelper.getKnoteOptions(this.activeKnote.get('content'));
+    var content = $("#knote-edit-area").html().trim();
+
+    if (options.title === oldOptions.title && options.htmlBody === oldOptions.htmlBody){
       if (_.isFunction(callback)) {
         callback(false);
       }
+      return;
     }
+
+    this._showSyncLoader();
+    this.activeKnote.set({
+      updated_date: Date.now(),
+      content: content
+    });
+    knoteClient.updateKnote(knoteId, options)
+      .then(function(id){
+        console.log("Update knote", knoteId, " Success!");
+        window._knotesView._hideSyncLoader();
+        if (_.isFunction(callback)) {
+          callback(true);
+        }
+      })
+      .fail(function(){
+        console.error("Update knote", knoteId, " FAILED!");
+        window._knotesView._hideSyncLoader();
+        if (_.isFunction(callback)) {
+          callback(false);
+        }
+      });
   },
 
 
 
   _sortKnotesList: function(){
+    var self = this;
+    var activeKnote = this.activeKnote;
     var $knotes = this.$el.find('#knotes-list');
     var $knotesLi = $knotes.find("li");
     $knotesLi.sort(function(knoteA, knoteB){
@@ -438,6 +469,15 @@ var KnotesView = Backbone.View.extend({
       return 0;
     });
     $knotesLi.detach().appendTo($knotes);
+    if (activeKnote) {
+      this.collection.each(function(model, collection) {
+        var isSame = model.get('knoteId') === activeKnote.get('knoteId');
+        if (isSame) {
+          self.activeKnote = model;
+        }
+        model.trigger('activate', isSame);
+      });
+    }
   },
 
 
@@ -445,6 +485,18 @@ var KnotesView = Backbone.View.extend({
   onKnoteAdded: function(model) {
     if ( model.get('archived') ) {
       return this;
+    }
+
+    if (!offlineMode.isOffline() && model.get('__offline__')) {
+      model.destroy();
+      window._knotesView.collection.remove(model);
+      return this;
+    }
+
+    var id = model.get('knoteId') || model.get('_id');
+    var $knote = $('.list-knote[data-knoteid=' + id + ']');
+    if ($knote.length) {
+      return;
     }
 
     var knoteView = new KnoteView(model);
@@ -466,7 +518,14 @@ var KnotesView = Backbone.View.extend({
 
 
 
-  onKnoteChanged: function(knote, collection, idx) {
+  onKnoteChanged: function(model, collection, idx) {
+    var newContent = model.get('content');
+    var editArea = $('#knote-edit-area');
+    if (this.activeKnote == model) {
+      if (editArea.is(':visible') && newContent != editArea.html().trim()) {
+        editArea.html(newContent);
+      }
+    }
     this._sortKnotesList();
   },
 
@@ -513,6 +572,7 @@ var KnotesView = Backbone.View.extend({
   setActiveKnote: function(id) {
     var activeKnote;
     var self = this;
+    var taskTitle = self.$el.find('#knote-list-title');
     if (id instanceof(KnoteModel)) {
       activeKnote = id;
     } else {
@@ -523,13 +583,14 @@ var KnotesView = Backbone.View.extend({
     if (!activeKnote) return;
     self._removeKnoteIfEmptyContent();
     self.activeKnote = activeKnote;
-    //this.$el.find(".new-knote.active").removeClass("active").addClass("hide");
     self.$el.find('.new-knote.active').remove();
 
     if(activeKnote.get('type')=="checklist") {
       self.cleanAddingListArea();
-      self.toggleListAreaView(true);
-      self.$el.find('#knote-list-title').val(activeKnote.get('title')).focus().removeClass("textarea_error").trigger('input');
+      if (!taskTitle.is(':visible')) {
+        self.toggleListAreaView(true);
+      }
+      taskTitle.val(activeKnote.get('title'));
       var options = activeKnote.get('options');
       if(typeof options != 'undefined') {
         options.forEach(function(item, index){
@@ -537,7 +598,9 @@ var KnotesView = Backbone.View.extend({
         })
       }
     } else {
-      self.toggleListAreaView(false);
+      if (taskTitle.is(':visible')) {
+        self.toggleListAreaView(false);
+      }
       self.cleanAddingListArea();
       self.$el.find('#knote-edit-area').html(activeKnote.get('content'));
       KnoteHelper.setCursorOnContentEditable($('#knote-edit-area')[0]);
@@ -576,6 +639,8 @@ var KnotesView = Backbone.View.extend({
     });
   },
 
+
+
   saveKnoteAsServerDraft: function(knoteData){
 
     var self = this;
@@ -595,6 +660,8 @@ var KnotesView = Backbone.View.extend({
     });
 
   },
+
+
 
   _syncGmailDraftsService: function(){
 
@@ -633,10 +700,11 @@ var KnotesView = Backbone.View.extend({
 
   },
 
+
+
   _syncServerKnotes: function(){
-
+    // TODO
     setInterval(function(){
-
       chrome.storage.local.get('knoteDrafts', function(items) {
         var knoteDrafts = items['knoteDrafts'] || [];
         // console.log("sync started");
@@ -656,7 +724,6 @@ var KnotesView = Backbone.View.extend({
           //console.log("window event ended")
         }
       });
-
     }, 15000);
   },
 
@@ -686,7 +753,7 @@ var KnotesView = Backbone.View.extend({
         title: listData.title,
         type: 'checklist',
         topicId: topicId,
-        options: listData.options.length?listData.options:[]
+        options: listData.options.length ? listData.options : []
       });
 
       newKnote.saveList();
@@ -700,6 +767,11 @@ var KnotesView = Backbone.View.extend({
 
   saveCurrentTask: function() {
     var self = this;
+    /*
+    if (offlineMode.isOffline()) {
+      self._updateKnoteOffline();
+    }
+    */
     if(!self.activeKnote){
       self.createList();
     }else {
@@ -840,9 +912,10 @@ var KnotesView = Backbone.View.extend({
 
 
   addListUI: function(e){
+    this.activeKnote = null;
     this.cleanAddingListArea();
     this.toggleListAreaView(true);
-    this.activeKnote = null;
+    this._addEmptyKnote();
   },
 
 

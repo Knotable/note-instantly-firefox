@@ -1,11 +1,45 @@
 'use strict';
 
+var offlineKnoteIds = [];
+
+window.sendAndClearOfflineKnotes = function() {
+  if (offlineKnoteIds.length) {
+    var knoteCollection = asteroid.getCollection('knotes');
+    _.each(offlineKnoteIds, function(id) {
+      var knote = knoteCollection.reactiveQuery({_id: id}).result[0];
+      if (!knote || !knote.__offline__) return;
+      delete knote._id;
+      delete knote.__offline__;
+      if (knote.type == 'knote') {
+        delete knote.type;
+        knoteServer.addKnote(knote);
+      } else if (knote.type == 'checklist') {
+        delete knote.type;
+        knoteServer.addListKnote(knote);
+      }
+      knoteCollection._localToLocalRemove(id);
+    });
+    offlineKnoteIds = [];
+  }
+};
+
 window.knoteServer = (function() {
   /*
   * Set K icon to inactive by default
   */
   var exports = {};
   var config = getConfig(runtime_mode);
+  var knoteCollection = asteroid.getCollection('knotes');
+
+  function addOfflineKnote(knote) {
+    if (knote._id) {
+      return;
+    }
+    knote._id = Asteroid.utils.guid();
+    knote.__offline__ = true;
+    offlineKnoteIds.push(knote._id);
+    return knoteCollection._localToLocalInsert(knote);
+  }
 
   exports.getPadLink = function(){
     return asteroid.getPadLink();
@@ -51,10 +85,15 @@ window.knoteServer = (function() {
       return false;
     }
 
-    exports.apply('updateNewTabTopicPosition', [requiredKnoteParams.topic_id, 300, 'ext:KnotableMeteor.addKnote']);
-
     console.log('======> add_knote: ', requiredKnoteParams, optionalKnoteParams);
-    return exports.call("add_knote", requiredKnoteParams, optionalKnoteParams);
+    if (!asteroid.isConnected) {
+      data.type = 'knote';
+      return addOfflineKnote(data);
+    } else {
+      exports.apply('updateNewTabTopicPosition', [requiredKnoteParams.topic_id, 300, 'ext:KnotableMeteor.addKnote']);
+
+      return exports.call("add_knote", requiredKnoteParams, optionalKnoteParams);
+    }
   };
 
   exports.addListKnote = function(data) {
@@ -76,7 +115,12 @@ window.knoteServer = (function() {
       options: data.options
 
     };
-    return exports.call("create_checklist", params);
+    if (!asteroid.isConnected) {
+      data.type = 'checklist';
+      return addOfflineKnote(data);
+    } else {
+      return exports.call("create_checklist", params);
+    }
   };
 
   exports.updateList = function (options) {

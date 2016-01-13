@@ -106,9 +106,11 @@ function handleFnCall(msg) {
       break;
     case 'notifications:create':
       notificationsHelper.create(msg.options);
+      break;
     case 'logout':
       extHelper.clearCache();
       extHelper.reloadPanel(panelWorker);
+      break;
     case 'login':
       extHelper.reloadPanel(panelWorker);
       newtabs.getAllWorkers(function(workersObject) {
@@ -116,6 +118,7 @@ function handleFnCall(msg) {
           extHelper.sendTopicId(workersObject[index]);
         }
       });
+      break;
   };
 }
 

@@ -13,9 +13,10 @@ var KnoteView = Backbone.View.extend({
     'click': 'focusKnote'
   },
   focusKnote: function(e) {
-    var self = this;
-    window._knotesView.saveCurrentKnote();
-    window._knotesView.setActiveKnote(self.model);
+    if ($('#knote-edit-area').is(':visible')) {
+      window._knotesView.saveCurrentKnote();
+    }
+    window._knotesView.setActiveKnote(this.model);
   },
   initialize: function(model) {
     this.template = _.template($('#knote-template').html());
@@ -24,11 +25,13 @@ var KnoteView = Backbone.View.extend({
     this.model.bind('save', function(resp) {
       self.$el.attr('data-knoteid', resp.knoteId);
 
-      if(window._knotesView.localKnoteID)
-      self.$el.attr('data-knoteIdLocal', window._knotesView.localKnoteID);
+      if(window._knotesView.localKnoteID) {
+        self.$el.attr('data-knoteIdLocal', window._knotesView.localKnoteID);
+      }
     });
     this.model.bind('change', this.render, this);
     this.model.bind('destroy', this.remove, this);
+    this.model.bind('remove', this.remove, this);
     this.model.bind('toggleView', this.toggleView, this);
     this.model.bind('activate', this.activate, this);
 
@@ -51,20 +54,13 @@ var KnoteView = Backbone.View.extend({
   },
   render: function() {
     var id = this.model.get('knoteId') || this.model.get('_id');
-    if (this.$el.data('knoteid') == '' &&
-       id && id != 'true' && $('.list-knote[data-knoteid=' + id + ']').length) {
+    var $knote = $('.list-knote[data-knoteid=' + id + ']');
+    if (this.$el.data('knoteid') == '' && id && id != 'true' && $knote.length) {
       this.remove();
     } else {
       var newElm = $(this.template(this.model.toJSON()));
       this.$el.replaceWith(newElm);
       this.setElement(newElm);
-    }
-
-    var newContent = this.model.get('content');
-    var editArea = $('#knote-edit-area');
-    if (window._knotesView.activeKnote == this.model &&
-         newContent != editArea.html().trim()) {
-      editArea.html(newContent);
     }
 
     return this;

@@ -57,8 +57,6 @@ var updateIcon = function(stat) {
 };
 
 
-window.knoteServer = new KnotableMeteor();
-
 
 var notificationsCallbacks = {};
 chrome.notifications.onClicked.addListener(function(id) {
@@ -71,34 +69,12 @@ chrome.notifications.onClicked.addListener(function(id) {
   }
   notificationsCallbacks[id] = undefined;
 });
+
 var notificationsTimers = {};
+
 window.createNotification = function(request) {
   // The notifications object in Firefox only has one method: notify
   chrome.notifications.create(request.options);
-  /*
-  chrome.notifications.getAll(function(notifications) {
-    var url = request.options.openURL;
-    delete request.options.openURL;
-
-    notifications = notifications || {};
-    var ids = Object.keys(notifications);
-    var notificationId = 'knote-' + (Math.random());
-    if (ids.length) {
-      notificationId = ids[0];
-      chrome.notifications.clear(notificationId, function() {});
-    }
-    if (notificationsTimers[notificationId]) clearTimeout(notificationsTimers[notificationId]);
-    delete notificationsTimers[notificationId];
-    var notification = chrome.notifications.create(notificationId, request.options, function(id) {
-      notificationsCallbacks[id] = url;
-      if (request.hideAfter) {
-        notificationsTimers[id] = setTimeout(function() {
-          chrome.notifications.clear(id, function() {});
-        }, request.hideAfter);
-      }
-    });
-  });
-  */
 }
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.method === 'createNotification') {

@@ -25,7 +25,6 @@ window.MessageManager = (function(){
 
   var _onDisconnected = function(){
     console.log("Server disconnected");
-    offlineMode.notifyOffline();
     offlineMode.isOfflineMode = true;
   };
 

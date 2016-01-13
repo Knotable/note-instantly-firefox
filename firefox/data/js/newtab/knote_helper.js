@@ -7,14 +7,14 @@ window.KnoteHelper = {
   // displaying on right side, Not for storing on db
   getTitleFromContent: function(content){
     var title, temp;
-    if(content.length < 1) return 'Untitled';
+    if(content.length < 1) return 'New';
     var contents = $('<div>').append(content).contents();
     title = $('<div>').append(contents[0]).text().trim();
 
     if(title.length < 1){
       // If there is no title than use body's first few letters
       title = $('<div>').append(content).text().trim();
-      if(title.length < 1) title = 'Untitled';
+      if(title.length < 1) title = 'New';
     }
 
     // If title has newline or carriage return,
@@ -24,6 +24,15 @@ window.KnoteHelper = {
       title = title.slice(0, temp)
     }
 
+    return this.getTrimTitle(title);
+  },
+
+
+
+  getTrimTitle: function(title) {
+    if (typeof title == 'undefined' || title.length < 1) {
+      title = 'New';
+    }
     return title.length < 25 ? title : title.substr(0, 23) + '...' ;
   },
 
@@ -33,8 +42,7 @@ window.KnoteHelper = {
     var title;
     if(typeof self.attributes.type != 'undefined' && self.attributes.type == 'checklist' ){
       title = self.attributes.title;
-      if(typeof title == 'undefined') title = 'Untitled'
-      return title.length < 25 ? title : title.substr(0, 23) + '...' ;
+      return this.getTrimTitle(title);
     }else{
       if(typeof self.attributes.content == 'undefined') return "Untitled";
       return this.getTitleFromContent(self.attributes.content);
@@ -44,7 +52,40 @@ window.KnoteHelper = {
 
 
 
-  getUpdateOptions: function($ele){
+  setCursorOnContentEditable : function($ele) {
+    var range, sel, textRange;
+    $ele.focus();
+    if( (typeof(window.getSelection) != "undefined") && (typeof(document.createRange) != "undefined")){
+      // IE 9 and non-IE
+      range = document.createRange();
+      range.selectNodeContents($ele);
+      range.collapse(false);
+      sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    else{
+      if (typeof document.body.createTextRange != "undefined"){
+        // IE < 9
+        textRange = document.body.createTextRange();
+        textRange.moveToElementText($ele);
+        textRange.collapse(false);
+        textRange.select();
+      }
+    }
+    return false;
+  },
+
+
+
+  getKnoteOptions: function(textContent) {
+    var $ele;
+    if (textContent) {
+      $ele = $('<div>');
+      $ele.html(textContent);
+    } else {
+      $ele = $('#knote-edit-area');
+    }
     var data = {};
     var body = '';
     var title, temp;
@@ -87,32 +128,33 @@ window.KnoteHelper = {
 
 
 
-  setCursorOnContentEditable : function($ele){
-    var range, sel, textRange;
-    $ele.focus();
-    if( (typeof(window.getSelection) != "undefined") && (typeof(document.createRange) != "undefined")){
-      // IE 9 and non-IE
-      range = document.createRange();
-      range.selectNodeContents($ele);
-      range.collapse(false);
-      sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-    else{
-      if (typeof document.body.createTextRange != "undefined"){
-        // IE < 9
-        textRange = document.body.createTextRange();
-        textRange.moveToElementText($ele);
-        textRange.collapse(false);
-        textRange.select();
+  getListData: function(){
+    var data = {};
+    var numinc = 1;
+    data.options = new Array();
+    data.title = $('#knote-list-title').val().trim();
+
+    $(".knote-added-list label").each(function(){
+      var checkbox = $(this).parent().find('input');
+      var checked = checkbox.prop('checked');
+      var checkedBy = checkbox.attr('data-checked-by');
+      if(!_.isEmpty($(this).html().trim())){
+        data.options.push({ num:numinc, name:$(this).html().trim(), voters:[checkedBy], checked:checked });
+        numinc++;
       }
+    });
+    return data;
+  },
+
+
+
+  getUpdateOptions: function(){
+    if ($('#knote-edit-area').is(':visible')) {
+      return this.getKnoteOptions();
+    } else {
+      return this.getListData();
     }
-    return false;
   }
-
-
-
 };
 
 })(window, jQuery);

@@ -6,6 +6,7 @@
 
 window.reactiveController = (function(){
   var exports = {};
+  var knotes = null;
 
 
 
@@ -19,7 +20,7 @@ window.reactiveController = (function(){
 
   var initKnoteWatchers = function() {
     console.log('initWatchers');
-    var knotes = asteroid.getCollection('knotes');
+    knotes = asteroid.getCollection('knotes');
     var knotesQuery = knotes.reactiveQuery({});
     _watchKnotes(knotesQuery);
     _sendCachedKnotes(knotesQuery);
@@ -46,6 +47,25 @@ window.reactiveController = (function(){
       var knote = _.find(knotesQuery.result, function(knote){
         return knoteId.match(knote._id);
       });
+
+      if (knote.type == 'checklist') {
+        var updateOption = asteroid.backupUpdateListStack[knote.order];
+        var option;
+        if (!updateOption) {
+          for (var order in asteroid.backupUpdateListStack) {
+            option = asteroid.backupUpdateListStack[order];
+            if (option.title == knote.title) {
+              updateOption = option;
+              delete asteroid.backupUpdateListStack[order];
+            }
+          }
+        }
+        if (updateOption) {
+          console.log('[Update offline task] id: ', knote._id, ', title: ', knote.title);
+          delete asteroid.backupUpdateListStack[knote.order];
+          knotes.update(knote._id, updateOption);
+        }
+      }
 
       if (knoteId.match('__upd__') && knote){
         _idOfKnoteToUpdate = knote._id;

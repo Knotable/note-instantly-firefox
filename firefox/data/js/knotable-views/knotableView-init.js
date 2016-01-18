@@ -36,11 +36,6 @@ var _addKnoteOnView = function(knotesView, newKnote) {
     if(knote.get('type') == "checklist" && moment(knote.get('updated_date')).isBefore(newKnote.updated_date, 'second')){
       console.log("#GC - _addKnoteOnView - updating checklist", knote.get('updated_date'),  newKnote.updated_date);
       knote.set({title: newKnote.title, options: newKnote.options, order: newKnote.order, timestamp: newKnote.timestamp, updated_date: newKnote.updated_date});
-      // if list is currently on active view,
-      // update the view
-      if (knotesView.activeKnote && knotesView.activeKnote.get('knoteId') == newKnote._id ){
-        $('.list-knote[data-knoteid=' + newKnote._id + ']').click();
-      }
     }
 
     // update the last sync time

@@ -6,6 +6,7 @@
 
 window.reactiveController = (function(){
   var exports = {};
+  var knotes = null;
 
 
 
@@ -19,7 +20,7 @@ window.reactiveController = (function(){
 
   var initKnoteWatchers = function() {
     console.log('initWatchers');
-    var knotes = asteroid.getCollection('knotes');
+    knotes = asteroid.getCollection('knotes');
     var knotesQuery = knotes.reactiveQuery({});
     _watchKnotes(knotesQuery);
     _sendCachedKnotes(knotesQuery);
@@ -29,7 +30,19 @@ window.reactiveController = (function(){
 
   var _sendCachedKnotes = function(knotesQuery){
     // send knotes from cache
-    _.each(knotesQuery.result, function(knote){
+    var results = _.groupBy(knotesQuery.result, function(knote) {
+      return knote._id;
+    });
+    _.each(_.values(results), function(knote){
+      // if the knote was created in offline mode, there will be
+      // two knotes here: the newest knote and the backup knote
+      if (knote.length > 1) {
+        knote = _.max(knote, function(k) {
+          return k.updated_date;
+        });
+      } else {
+        knote = knote[0];
+      }
       if(!knote.archived){
         _addedKnote(knote);
       }
@@ -46,6 +59,25 @@ window.reactiveController = (function(){
       var knote = _.find(knotesQuery.result, function(knote){
         return knoteId.match(knote._id);
       });
+
+      if (knote.type == 'checklist') {
+        var updateOption = asteroid.backupUpdateListStack[knote.order];
+        var option;
+        if (!updateOption) {
+          for (var order in asteroid.backupUpdateListStack) {
+            option = asteroid.backupUpdateListStack[order];
+            if (option.title == knote.title) {
+              updateOption = option;
+              delete asteroid.backupUpdateListStack[order];
+            }
+          }
+        }
+        if (updateOption) {
+          console.log('[Update offline task] id: ', knote._id, ', title: ', knote.title);
+          delete asteroid.backupUpdateListStack[knote.order];
+          knotes.update(knote._id, updateOption);
+        }
+      }
 
       if (knoteId.match('__upd__') && knote){
         _idOfKnoteToUpdate = knote._id;

@@ -406,6 +406,8 @@ var KnotesView = Backbone.View.extend({
     var oldOptions = KnoteHelper.getKnoteOptions(this.activeKnote.get('content'));
     var content = $("#knote-edit-area").html().trim();
 
+    if (this.activeKnote.get('type') != 'knote') return;
+
     if (options.title === oldOptions.title && options.htmlBody === oldOptions.htmlBody){
       if (_.isFunction(callback)) {
         callback(false);
@@ -493,12 +495,6 @@ var KnotesView = Backbone.View.extend({
       return this;
     }
 
-    var id = model.get('knoteId') || model.get('_id');
-    var $knote = $('.list-knote[data-knoteid=' + id + ']');
-    if ($knote.length) {
-      return;
-    }
-
     var knoteView = new KnoteView(model);
     knoteView = knoteView.render().$el;
 
@@ -521,9 +517,21 @@ var KnotesView = Backbone.View.extend({
   onKnoteChanged: function(model, collection, idx) {
     var newContent = model.get('content');
     var editArea = $('#knote-edit-area');
+    var self = this;
     if (this.activeKnote == model) {
-      if (editArea.is(':visible') && newContent != editArea.html().trim()) {
-        editArea.html(newContent);
+      if (editArea.is(':visible')) {
+        if (newContent != editArea.html().trim()) {
+          editArea.html(newContent);
+        }
+      } else {
+        this.cleanAddingListArea();
+        $('#knote-list-title').val(model.get('title'));
+        var options = model.get('options');
+        if(typeof options != 'undefined') {
+          options.forEach(function(item, index){
+            self.addListItemToUI(item.name, item.checked, item.voters[0])
+          })
+        }
       }
     }
     this._sortKnotesList();
@@ -898,14 +906,19 @@ var KnotesView = Backbone.View.extend({
 
 
   updateListItem: function(){
-    var options =  KnoteHelper.getListData();
+    var options = KnoteHelper.getListData();
+    var knoteId = this.activeKnote.get('knoteId');
     this.activeKnote.set({
       'title': options.title,
       'options': options.options,
       'updated_date': Date.now()
     });
-    options.knoteId = this.activeKnote.get('knoteId');
     options.case = "updateItems";
+    options.knoteId = knoteId;
+    if (!knoteId) {
+      options.order = this.activeKnote.get('order');
+      options.title = options.title;
+    }
     knoteClient.updateList(options);
   },
 

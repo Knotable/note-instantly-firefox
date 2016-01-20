@@ -46,6 +46,10 @@
 		this._onUpdatedCallbacks = {};
 		this._events = {};
 		this._queue = [];
+    this._waitingMethodResultStack = {
+      minId: 0,
+      methods: {}
+    };
 		// Setup
 		this.readyState = -1;
 		this._reconnect_count = 0;
@@ -70,6 +74,14 @@
 		var id = uniqueId();
 		this._onResultCallbacks[id] = onResult;
 		this._onUpdatedCallbacks[id] = onUpdated;
+    if (this._waitingMethodResultStack.minId == 0) {
+      this._waitingMethodResultStack.minId = id;
+    }
+    this._waitingMethodResultStack.methods[id] = {
+			method: name,
+			params: params
+    };
+
 		this._send({
 			msg: "method",
 			id: id,
@@ -164,6 +176,31 @@
 	};
 
 	DDP.prototype._on_result = function (data) {
+    delete this._waitingMethodResultStack.methods[data.id];
+    // some method did not get response, we assume that those method were sent failed.
+    // and we resend the method here.
+    if (this._waitingMethodResultStack.minId > 0 && data.id > this._waitingMethodResultStack.minId) {
+      var methodInfo = null;
+      for (var methodId in this._waitingMethodResultStack.methods) {
+        if (methodId < data.id) {
+          methodInfo = this._waitingMethodResultStack.methods[methodId];
+          this._send({
+            msg: "method",
+            id: methodId,
+            method: methodInfo.method,
+            params: methodInfo.params
+          });
+          // only re-try one time
+          delete this._waitingMethodResultStack.methods[methodId];
+        }
+      }
+    }
+    var waitingMethodIds = Object.keys(this._waitingMethodResultStack.methods);
+    if (waitingMethodIds.length) {
+      this._waitingMethodResultStack.minId = Math.min.apply(null, waitingMethodIds);
+    } else {
+      this._waitingMethodResultStack.minId = 0;
+    }
 		if (this._onResultCallbacks[data.id]) {
 			this._onResultCallbacks[data.id](data.error, data.result);
 			delete this._onResultCallbacks[data.id];

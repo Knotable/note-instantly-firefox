@@ -310,8 +310,21 @@ window.asteroid = (function(){
     }
     updateOption.updated_date = Date.now();
     console.log("updateList - ", updateOption);
-    knotes.update(options.knoteId, updateOption).local;
+    if (!options.knoteId && _.isNumber(options.order)) {
+      if (!asteroid.backupUpdateListStack[options.order]) {
+        asteroid.backupUpdateListStack[options.order] = {}
+      }
+      asteroid.backupUpdateListStack[options.order].title = options.title;
+      switch(options.case) {
+        case "updateItems":
+          asteroid.backupUpdateListStack[options.order].options = options.options;
+          break;
+      }
+    }
+    return knotes.update(options.knoteId, updateOption).local;
   };
+
+  exports.backupUpdateListStack = {};
 
   exports.init(config.server);
   return exports;

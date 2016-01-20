@@ -495,12 +495,6 @@ var KnotesView = Backbone.View.extend({
       return this;
     }
 
-    var id = model.get('knoteId') || model.get('_id');
-    var $knote = $('.list-knote[data-knoteid=' + id + ']');
-    if ($knote.length) {
-      return;
-    }
-
     var knoteView = new KnoteView(model);
     knoteView = knoteView.render().$el;
 

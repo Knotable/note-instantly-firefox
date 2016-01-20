@@ -30,7 +30,19 @@ window.reactiveController = (function(){
 
   var _sendCachedKnotes = function(knotesQuery){
     // send knotes from cache
-    _.each(knotesQuery.result, function(knote){
+    var results = _.groupBy(knotesQuery.result, function(knote) {
+      return knote._id;
+    });
+    _.each(_.values(results), function(knote){
+      // if the knote was created in offline mode, there will be
+      // two knotes here: the newest knote and the backup knote
+      if (knote.length > 1) {
+        knote = _.max(knote, function(k) {
+          return k.updated_date;
+        });
+      } else {
+        knote = knote[0];
+      }
       if(!knote.archived){
         _addedKnote(knote);
       }

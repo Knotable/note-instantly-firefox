@@ -195,8 +195,6 @@ window.KnotableViews = function(events) {
     signup: function(evt) {
       if (evt && evt.type === 'submit' && evt.preventDefault) evt.preventDefault();
       var self = this;
-      // TODO mark sign up source
-      //var signupFrom = 8; // kNoteInstantly
       var signupData = {};
       var data = {};
 
@@ -204,6 +202,7 @@ window.KnotableViews = function(events) {
       signupData.username         = this.$el.find("#knotable-signup-username").val();
       signupData.email            = this.$el.find("#knotable-signup-email").val();
       signupData.password         = this.$el.find("#knotable-signup-password").val();
+      signupData.signup_method    = 11;
 
       if (signupData.username == "")
       {
@@ -239,7 +238,6 @@ window.KnotableViews = function(events) {
 
       this.$el.find("#knotable-button-signup")[0].disabled = true;
       self.printStatus('');
-      //knoteClient.call('createAccount', signupData, null, false, false, signupFrom).then(function(userData) {
       knoteClient.call('createAccount', signupData).then(function(userData) {
         loginWithPassword(data.email, data.password)
         .then(function(a) {

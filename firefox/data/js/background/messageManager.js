@@ -3,6 +3,16 @@
 window.MessageManager = (function(){
   var config = getConfig(runtime_mode);
   var exports = {};
+  var hasDisconnectedMsgShown = false;
+
+  var showNotification = function(msg) {
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'images/icon-48.png',
+      title: 'Knotable',
+      message: msg
+    });
+  };
 
   var sendMessageToNewTabPage = function(message){
     chrome.runtime.sendMessage(message);
@@ -87,13 +97,24 @@ window.MessageManager = (function(){
     var message = {
       msg: "connected"
     };
+    hasDisconnectedMsgShown = false;
+    window.sendAndClearOfflineKnotes();
     sendMessageToNewTabPage(message);
+  };
+
+  exports.reconnected = function() {
+    exports.connected();
+    showNotification('Connected to Knotable.');
   };
 
   exports.disconnected = function(){
     var message = {
       msg: "disconnected"
     };
+    if (!hasDisconnectedMsgShown) {
+      hasDisconnectedMsgShown = true;
+      showNotification('Could not connect to Knotable. Please check your internet connection.');
+    }
     sendMessageToNewTabPage(message);
   };
 
